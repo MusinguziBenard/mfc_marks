@@ -1,0 +1,16 @@
+{
+    "name": "App Name",
+    "short_name": "AOI Marks",
+    "start_url": "/",
+    "display": "standalone",
+    "icons": [
+      {
+        "src": "icon.png",
+        "sizes": "148x148",
+        "type": "image/png"
+      }
+    ],
+    "background_color": "#ffffff",
+    "theme_color": "#000000"
+  }
+  

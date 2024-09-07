@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="icon.png" sizes="148x148" type="image/png">
+    <link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png">
+    <link rel="manifest" href="manifest.json">
+    <title>Munteme Fatima College Report Cards</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            color: #495057;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Loader Styles */
+        #loader {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #loader .spinner {
+            border: 6px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 6px solid #007bff;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Slide-in Popup */
+        #popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            text-align: center;
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        #popup button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Header and Navigation Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            padding: 15px 20px;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .hamburger-container {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 3px;
+            background-color: white;
+            margin: 5px 0;
+            transition: 0.4s;
+            border-radius: 5px;
+        }
+
+        .menu {
+            display: none;
+            flex-direction: column;
+            background-color: #007bff;
+            border-radius: 0 0 10px 10px;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 200px;
+            z-index: 1000;
+        }
+
+        .menu a {
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid #0056b3;
+        }
+
+        .menu a:last-child {
+            border-bottom: none;
+        }
+
+        .menu a:hover {
+            background-color: #0056b3;
+        }
+
+        .menu a.inactive {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Main Container */
+        .container {
+            
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #offline-warning {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        /* Footer Styles */
+        footer {
+            /* background-color; */
+            color: grey;
+            text-align: center;
+            padding: 1px 0;
+            margin-top: auto;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            font-size: 6px;
+        }
+        
+         .modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 999;
+}
+
+.modal {
+    position: fixed;
+    top: -100%;
+    right: 10px;
+    width: 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: top 1.5s ease;
+    z-index: 1000;
+}
+
+.modal.show {
+    top: 20px;
+}
+
+.modal p {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.modal button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.modal button:hover {
+    background-color: #0056b3;
+}
+
+    </style>
+</head>
+<body>
+    <div id="loader">
+        <div class="spinner"></div>
+        <h2>Loading...</h2>
+    </div>
+
+    <header>
+        <h2>Munteme Fatima College Report Cards</h2>
+        <div class="hamburger-container" onclick="toggleMenu()">
+            <div class="hamburger"></div>
+            <div class="hamburger"></div>
+            <div class="hamburger"></div>
+        </div>
+        <div class="menu" id="menu">
+            <a href="#" class="inactive" onclick="alert('Feature under development...')">Home</a>
+            <a href="#" class="inactive" onclick="alert('Feature is restricted for now...')">Reports</a>
+            <a href="#" class="inactive" onclick="alert('Feature restricted...')">Settings</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Teacher's Mark Entry System</h2>
+        <iframe id="sheetFrame" src="https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=sharing"></iframe>
+    </div>
+
+    <div id="popup">
+        <p>It seems you cannot edit directly within this frame. Please open the sheet in a new tab to enable editing.</p>
+        <button id="openSheetButton">Open in New Tab</button>
+    </div>
+
+    <div id="offline-warning">You're offline. Data will not be synchronized.</div>
+
+    <!-- Footer Section -->
+    <footer> &copy; <span id="currentYear"></span> Munteme Fatima College. All rights reserved. </footer>
+
+<div id="modalBackground" class="modal-background"></div>
+
+<div id="teacherModal" class="modal">
+    <p>Are you a class teacher?</p>
+    <button id="classTeacherYes">Yes</button>
+    <button id="classTeacherNo">No</button>
+</div>
+
+<div id="classTeacherModal" class="modal">
+    <p>Please oversee the names of all students and ensure no student is missing. Encourage all teachers to enter their marks on time.</p>
+    <button id="classTeacherClose">OK</button>
+</div>
+
+<div id="subjectTeacherModal" class="modal">
+    <p>Please fill the activities of integration (AOI 1, AOI 2, AOI3), marks out of 80 (/80), and your initials in the appropriate field. <br> <br>Otherwise burser should fill school fees balance in fees balance field</p>
+    <button id="subjectTeacherClose">OK</button>
+</div>
+
+<div id="finalModal" class="modal">
+    <p style="color: green">Happy teaching...</p>
+</div>
+
+    <script>
+        // Show loader for 3 seconds before displaying content
+        setTimeout(function() {
+            document.getElementById('loader').style.display = 'none';
+        }, 3000);
+
+        // Function to toggle menu visibility
+        function toggleMenu() {
+            var menu = document.getElementById('menu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Function to show popup with slide-in animation
+        function showPopup() {
+            var popup = document.getElementById('popup');
+            popup.style.display = 'block';
+        }
+
+        // Function to hide popup
+        function hidePopup() {
+            var popup = document.getElementById('popup');
+            popup.style.display = 'none';
+        }
+
+        // Function to open the sheet in a new tab
+        document.getElementById('openSheetButton').onclick = function() {
+            window.open('https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=sharing', '_blank');
+        };
+
+        // Function to check for internet connection
+        function checkInternetConnection() {
+            var offlineWarning = document.getElementById('offline-warning');
+            if (navigator.onLine) {
+                offlineWarning.style.display = 'none';
+            } else {
+                offlineWarning.style.display = 'block';
+            }
+        }
+
+        // Set interval to check for internet connection every 5 seconds
+        setInterval(checkInternetConnection, 5000);
+
+        // Listen for online/offline events
+        window.addEventListener('online', checkInternetConnection);
+        window.addEventListener('offline', checkInternetConnection);
+
+        // Run the popup behavior based on device type
+        window.onload = function() {
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                showPopup();
+                setInterval(function() {
+                    showPopup();
+                    setTimeout(hidePopup, 5000);
+                }, 8000);
+            } else {
+                
+            }
+        };
+        
+        // Set current year dynamically
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        
+        
+ 
+
+
+// Function to show a modal
+function showModal(modalId) {
+    document.getElementById('modalBackground').style.display = 'block';
+    document.getElementById(modalId).classList.add('show');
+}
+
+// Function to hide all modals
+function hideAllModals() {
+    document.getElementById('modalBackground').style.display = 'none';
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.classList.remove('show');
+    });
+}
+
+// Display the first modal after 4 seconds
+setTimeout(function() {
+    showModal('teacherModal');
+}, 4000);
+
+// Class Teacher Modal Logic
+document.getElementById('classTeacherYes').addEventListener('click', function() {
+    hideAllModals();
+    setTimeout(function() {
+        showModal('classTeacherModal');
+    }, 1000);  // Delay before showing the next modal
+});
+
+document.getElementById('classTeacherNo').addEventListener('click', function() {
+    hideAllModals();
+    setTimeout(function() {
+        showModal('subjectTeacherModal');
+    }, 1000);  // Delay before showing the next modal
+});
+
+// Logic to close the modals when the user clicks the close buttons
+document.getElementById('classTeacherClose').addEventListener('click', function() {
+    hideAllModals();
+    // Show the final modal after the interaction is complete
+    setTimeout(function() {
+        showModal('finalModal');
+        // Automatically hide the final modal after 2 seconds
+        setTimeout(function() {
+            hideAllModals();
+        }, 2000);
+    }, 1000);
+});
+
+document.getElementById('subjectTeacherClose').addEventListener('click', function() {
+    hideAllModals();
+    // Show the final modal after the interaction is complete
+    setTimeout(function() {
+        showModal('finalModal');
+        // Automatically hide the final modal after 2 seconds
+        setTimeout(function() {
+            hideAllModals();
+        }, 2000);
+    }, 1000);
+});
+
+// Assuming you have a third modal with the ID 'finalModal' that will display and disappear automatically
+
+
+
+
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+    .then(function() {
+        console.log('Service Worker Registered');
+    });
+}
+
+
+
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the default prompt from showing
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallPromotion();  // Trigger UI that invites the user to install
+
+    // Listen to the user interaction for installation
+    document.getElementById('installButton').addEventListener('click', () => {
+        // Show the install prompt
+        deferredPrompt.prompt();
+
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            } else {
+                console.log('User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+        });
+    });
+});
+
+    </script>
+</body>
+</html>
+
