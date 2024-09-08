@@ -1,17 +1,24 @@
+
 {
     "name": "Fatima College AOI Marks",
     "short_name": "AOI Marks",
-    "start_url": "/",
-    "display": "standalone",
-    "icons": [
-      {
-        "src": "icon.png",
-        "sizes": "148x148",
-        "type": "image/png"
-      }
-    ],
-    "background_color": "#ffffff",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
     "background_color": "blue",
-    "theme_color": "#000000"
-  }
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
   
