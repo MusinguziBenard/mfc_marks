@@ -12,10 +12,12 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
+
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             color: #495057;
+            color:white;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -85,7 +87,6 @@
             justify-content: space-between;
             align-items: center;
             background-color: #007bff;
-            background-color: blue;
             padding: 15px 20px;
             color: white;
             position: fixed;
@@ -162,7 +163,6 @@
         h2 {
             text-align: center;
             color: #333;
-            color:white;
         }
 
         iframe {
@@ -245,61 +245,6 @@
     background-color: #0056b3;
 }
 
-
-        /* Login Modal Styles */
-        #loginModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        #loginModal .login-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-
-        #loginModal h3 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        #loginModal input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        #loginModal button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        #loginModal button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Hide Modal Initially */
-        #loginModal.hidden {
-            display: none;
-        }
 
 
 /* Transparent Modal Background */
@@ -438,7 +383,6 @@
         </div>
     </div>
 
-
     <header>
         <h2>Munteme Fatima College Report Cards</h2>
         <div class="hamburger-container" onclick="toggleMenu()">
@@ -455,12 +399,12 @@
 
     <div class="container">
         <h2>Teacher's Mark Entry System</h2>
-        <iframe id="sheetFrame" src="https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=drivesdk"></iframe>
+        <iframe id="sheetFrame" src="https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=sharing"></iframe>
     </div>
 
     <div id="popup">
-        <p>This is a view frame. Please click on the green button below to start entering marks.</p>
-        <button id="openSheetButton">Start Entering >>> </button>
+        <p>It seems you cannot edit directly within this frame. Please open the sheet in a new tab to enable editing.</p>
+        <button id="openSheetButton">Open in New Tab</button>
     </div>
 
     <div id="offline-warning">You're offline. Data will not be synchronized.</div>
@@ -472,7 +416,6 @@
 
 <div id="teacherModal" class="modal">
     <p>Are you a class teacher?</p>
-<p>Please oversee the names of all students and ensure no student is missing. Encourage all teachers to enter their marks on time.</p>
     <button id="classTeacherYes">Yes</button>
     <button id="classTeacherNo">No</button>
 </div>
@@ -483,7 +426,7 @@
 </div>
 
 <div id="subjectTeacherModal" class="modal">
-    <p>Please fill the activities of integration (AOI1, AOI2, AOI3), marks out of 80 (/80), and your initials in the appropriate field. <br> <br>Otherwise burser should fill school fees balance in fees balance field</p>
+    <p>Please fill the activities of integration (AOI 1, AOI 2, AOI3), marks out of 80 (/80), and your initials in the appropriate field. <br> <br>Otherwise burser should fill school fees balance in fees balance field</p>
     <button id="subjectTeacherClose">OK</button>
 </div>
 
@@ -517,7 +460,7 @@
 
         // Function to open the sheet in a new tab
         document.getElementById('openSheetButton').onclick = function() {
-            window.open('https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=drivesdk', '_blank');
+            window.open('https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=sharing', '_blank');
         };
 
         // Function to check for internet connection
@@ -621,13 +564,14 @@ document.getElementById('subjectTeacherClose').addEventListener('click', functio
 
 // Assuming you have a third modal with the ID 'finalModal' that will display and disappear automatically
 
-      if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        }).catch((error) => {
-            console.log('Service Worker registration failed:', error);
-        });
+
+
+
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+    .then(function() {
+        console.log('Service Worker Registered');
     });
 }
 
@@ -636,20 +580,22 @@ document.getElementById('subjectTeacherClose').addEventListener('click', functio
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the default prompt from showing
     e.preventDefault();
     deferredPrompt = e;
-    // Show your custom install button or message here
-    const installButton = document.getElementById('installButton');
-    installButton.style.display = 'block';
+    showInstallPromotion();  // Trigger UI that invites the user to install
 
-    installButton.addEventListener('click', () => {
-        installButton.style.display = 'none';
+    // Listen to the user interaction for installation
+    document.getElementById('installButton').addEventListener('click', () => {
+        // Show the install prompt
         deferredPrompt.prompt();
+
+        // Wait for the user to respond to the prompt
         deferredPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
+                console.log('User accepted the install prompt');
             } else {
-                console.log('User dismissed the A2HS prompt');
+                console.log('User dismissed the install prompt');
             }
             deferredPrompt = null;
         });
@@ -675,41 +621,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
             document.getElementById('loginModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Disable body scrolling
         };
-
-      if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        }).catch((error) => {
-            console.log('Service Worker registration failed:', error);
-        });
-    });
-}
-
-
-
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    // Show your custom install button or message here
-    const installButton = document.getElementById('installButton');
-    installButton.style.display = 'block';
-
-    installButton.addEventListener('click', () => {
-        installButton.style.display = 'none';
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null;
-        });
-    });
-});
 
     </script>
 </body>
