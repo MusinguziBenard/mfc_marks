@@ -675,9 +675,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
             document.getElementById('loginModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Disable body scrolling
         };
-    </script>
-</body>
-</html>
+
       if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js').then((registration) => {
