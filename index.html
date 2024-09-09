@@ -301,15 +301,15 @@
             display: none;
         }
 
-        
-/* Login Modal */
+
+/* Transparent Modal Background */
 #loginModal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.75); /* Dark transparent background */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -317,12 +317,13 @@
     animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Login Modal Content */
+/* Login Modal Content with Transparency */
 #loginModal .login-content {
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0.1); /* Glass effect */
+    backdrop-filter: blur(10px); /* Blur background */
     padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     text-align: center;
     width: 90%;
     max-width: 400px;
@@ -330,12 +331,13 @@
     opacity: 0;
     transform: translateY(50px);
     animation-fill-mode: forwards;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for glass effect */
 }
 
 /* Header for the Login Modal */
 #loginModal h3 {
     margin-bottom: 20px;
-    color: #333;
+    color: #fff; /* White text for contrast */
     font-size: 1.8rem;
     font-weight: 600;
 }
@@ -345,16 +347,19 @@
     width: 100%;
     padding: 12px;
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Transparent input border */
     border-radius: 5px;
     font-size: 1rem;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.15); /* Light transparent background */
+    color: #fff; /* White text for contrast */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease-in-out;
 }
 
 /* Focus effect for Input */
 #loginModal input:focus {
     border-color: #007bff;
+    background-color: rgba(255, 255, 255, 0.3);
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
     outline: none;
 }
@@ -362,7 +367,7 @@
 /* Button Styling */
 #loginModal button {
     padding: 12px 20px;
-    background-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.8); /* Transparent button */
     color: white;
     border: none;
     border-radius: 5px;
@@ -375,7 +380,7 @@
 
 /* Button Hover Effect */
 #loginModal button:hover {
-    background-color: #0056b3;
+    background-color: rgba(0, 123, 255, 1); /* Slightly more opaque on hover */
 }
 
 /* Mobile Responsive */
@@ -415,6 +420,7 @@
         transform: translateY(0);
     }
 }
+
     </style>
 </head>
 <body>
