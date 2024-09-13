@@ -377,9 +377,6 @@
         <div class="spinner"></div>
         <h2>Loading...</h2>
     </div>
-
-
-
     <header>
         <h2>Munteme Fatima College Report Cards</h2>
         <div class="hamburger-container" onclick="toggleMenu()">
@@ -404,8 +401,6 @@
             <button onclick="login()">Login</button>
         </div>
     </div>
-
-        
         <h2>Teacher's Mark Entry System</h2>
         <iframe id="sheetFrame" src="https://docs.google.com/spreadsheets/d/1pZtqBqrJ3KMEAn16mfv_OtztyKcDt0OA-xTa0cKcOts/edit?usp=sharing"></iframe>
     </div>
@@ -420,27 +415,6 @@
     <!-- Footer Section -->
     <footer> &copy; <span id="currentYear"></span> Munteme Fatima College. All rights reserved. </footer>
 
-<div id="modalBackground" class="modal-background"></div>
-
-<div id="teacherModal" class="modal">
-    <p>Are you a class teacher?</p>
-    <button id="classTeacherYes">Yes</button>
-    <button id="classTeacherNo">No</button>
-</div>
-
-<div id="classTeacherModal" class="modal">
-    <p>Please oversee the names of all students and ensure no student is missing. Encourage all teachers to enter their marks on time.</p>
-    <button id="classTeacherClose">OK</button>
-</div>
-
-<div id="subjectTeacherModal" class="modal">
-    <p>Please fill the activities of integration (AOI 1, AOI 2, AOI3), marks out of 80 (/80), and your initials in the appropriate field. <br> <br>Otherwise burser should fill school fees balance in fees balance field</p>
-    <button id="subjectTeacherClose">OK</button>
-</div>
-
-<div id="finalModal" class="modal">
-    <p style="color: green">Happy teaching...</p>
-</div>
 
     <script>
         // Show loader for 3 seconds before displaying content
@@ -505,12 +479,6 @@
         
         // Set current year dynamically
         document.getElementById('currentYear').textContent = new Date().getFullYear();
-        
-        
-        
- 
-
-
 // Function to show a modal
 function showModal(modalId) {
     document.getElementById('modalBackground').style.display = 'block';
@@ -530,61 +498,13 @@ setTimeout(function() {
     showModal('teacherModal');
 }, 4000);
 
-// Class Teacher Modal Logic
-document.getElementById('classTeacherYes').addEventListener('click', function() {
-    hideAllModals();
-    setTimeout(function() {
-        showModal('classTeacherModal');
-    }, 1000);  // Delay before showing the next modal
-});
-
-document.getElementById('classTeacherNo').addEventListener('click', function() {
-    hideAllModals();
-    setTimeout(function() {
-        showModal('subjectTeacherModal');
-    }, 1000);  // Delay before showing the next modal
-});
-
-// Logic to close the modals when the user clicks the close buttons
-document.getElementById('classTeacherClose').addEventListener('click', function() {
-    hideAllModals();
-    // Show the final modal after the interaction is complete
-    setTimeout(function() {
-        showModal('finalModal');
-        // Automatically hide the final modal after 2 seconds
-        setTimeout(function() {
-            hideAllModals();
-        }, 2000);
-    }, 1000);
-});
-
-document.getElementById('subjectTeacherClose').addEventListener('click', function() {
-    hideAllModals();
-    // Show the final modal after the interaction is complete
-    setTimeout(function() {
-        showModal('finalModal');
-        // Automatically hide the final modal after 2 seconds
-        setTimeout(function() {
-            hideAllModals();
-        }, 2000);
-    }, 1000);
-});
-
 // Assuming you have a third modal with the ID 'finalModal' that will display and disappear automatically
-
-
-
-
-
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
     .then(function() {
         console.log('Service Worker Registered');
     });
 }
-
-
-
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
