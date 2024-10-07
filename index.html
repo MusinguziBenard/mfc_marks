@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geolocation and Reverse Geocoding</title>
+    <title>Geolocation and Village Name Fetcher</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,6 +20,7 @@
     <script>
         const weatherApiKey = '74037a84a785450abf9190335241409'; // Your weather API key
         const weatherApiUrl = 'https://api.openweathermap.org/data/2.5/weather';
+        const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse'; // Nominatim API for reverse geocoding
 
         function getGeoLocation() {
             if (navigator.geolocation) {
@@ -40,24 +41,58 @@
         }
 
         function fetchVillageName(lat, long) {
-            // Make an API call to fetch the weather data which includes location details
-            const url = `${weatherApiUrl}?lat=${lat}&lon=${long}&appid=${weatherApiKey}&units=metric`;
+            // Fetch weather data
+            const weatherUrl = `${weatherApiUrl}?lat=${lat}&lon=${long}&appid=${weatherApiKey}&units=metric`;
 
-            fetch(url)
+            fetch(weatherUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error('Network response was not ok: ' + response.statusText);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    const village = data.name; // Village name from the weather API
-                    const ipAddress = data.sys.country; // Fetch the country as a placeholder for IP
-                    document.getElementById('village-name').innerText = `Village Name: ${village}`;
-                    document.getElementById('ip-address').innerText = `Country Code: ${ipAddress}`;
+                    console.log('Weather API Response:', data); // Log the API response
+
+                    // Attempt to get the village name from the weather API
+                    let village = data.name; // Default to the name returned by the weather API
+
+                    // If the village name is not found, use Nominatim to reverse geocode the coordinates
+                    if (!village) {
+                        return fetchVillageFromCoordinates(lat, long);
+                    } else {
+                        const country = data.sys.country; // Country code from the API
+                        document.getElementById('village-name').innerText = `Village Name: ${village}`;
+                        document.getElementById('ip-address').innerText = `Country Code: ${country}`;
+                    }
                 })
                 .catch(error => {
-                    console.error('Error fetching the village name:', error);
+                    console.error('Error fetching the village name from Weather API:', error);
+                    document.getElementById('village-name').innerText = "Failed to retrieve village name.";
+                });
+        }
+
+        function fetchVillageFromCoordinates(lat, long) {
+            const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${long}&format=json`;
+
+            fetch(reverseGeocodeUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Nominatim API Response:', data); // Log the Nominatim API response
+
+                    if (data && data.display_name) {
+                        document.getElementById('village-name').innerText = `Village Name: ${data.display_name}`;
+                    } else {
+                        throw new Error('Village name not found in the Nominatim API response.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching the village name from Nominatim API:', error);
                     document.getElementById('village-name').innerText = "Failed to retrieve village name.";
                 });
         }
