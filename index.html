@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geolocation and Village Name Fetcher</title>
+    <title>Geolocation and Reverse Geocoding</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,26 +40,21 @@
         }
 
         function fetchVillageName(lat, long) {
-            // Make an API call to fetch the weather data
+            // Make an API call to fetch the weather data which includes location details
             const url = `${weatherApiUrl}?lat=${lat}&lon=${long}&appid=${weatherApiKey}&units=metric`;
 
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
+                        throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('API Response:', data); // Log the API response
-                    if (data && data.name) {
-                        const village = data.name; // Village name from the weather API
-                        const country = data.sys.country; // Country code from the API
-                        document.getElementById('village-name').innerText = `Village Name: ${village}`;
-                        document.getElementById('ip-address').innerText = `Country Code: ${country}`;
-                    } else {
-                        throw new Error('Village name not found in the API response.');
-                    }
+                    const village = data.name; // Village name from the weather API
+                    const ipAddress = data.sys.country; // Fetch the country as a placeholder for IP
+                    document.getElementById('village-name').innerText = `Village Name: ${village}`;
+                    document.getElementById('ip-address').innerText = `Country Code: ${ipAddress}`;
                 })
                 .catch(error => {
                     console.error('Error fetching the village name:', error);
