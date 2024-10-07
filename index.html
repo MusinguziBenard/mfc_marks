@@ -55,10 +55,10 @@
                     console.log('Weather API Response:', data); // Log the API response
 
                     // Attempt to get the village name from the weather API
-                    let village = data.name; // Default to the name returned by the weather API
+                    const village = data.name || 'unknown'; // Default to 'unknown' if the name is not available
 
-                    // If the village name is not found, use Nominatim to reverse geocode the coordinates
-                    if (!village) {
+                    // If the village name is 'unknown', use Nominatim to reverse geocode the coordinates
+                    if (village === 'unknown') {
                         return fetchVillageFromCoordinates(lat, long);
                     } else {
                         const country = data.sys.country; // Country code from the API
@@ -68,12 +68,13 @@
                 })
                 .catch(error => {
                     console.error('Error fetching the village name from Weather API:', error);
-                    document.getElementById('village-name').innerText = "Failed to retrieve village name.";
+                    document.getElementById('village-name').innerText = "Failed to retrieve village name. Attempting Nominatim...";
+                    fetchVillageFromCoordinates(lat, long); // Fallback to Nominatim if weather API fails
                 });
         }
 
         function fetchVillageFromCoordinates(lat, long) {
-            const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${long}&format=json`;
+            const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${long}&format=json&accept-language=en`;
 
             fetch(reverseGeocodeUrl)
                 .then(response => {
@@ -85,10 +86,11 @@
                 .then(data => {
                     console.log('Nominatim API Response:', data); // Log the Nominatim API response
 
+                    // Check if data is returned correctly
                     if (data && data.display_name) {
                         document.getElementById('village-name').innerText = `Village Name: ${data.display_name}`;
                     } else {
-                        throw new Error('Village name not found in the Nominatim API response.');
+                        document.getElementById('village-name').innerText = "Failed to retrieve village name.";
                     }
                 })
                 .catch(error => {
