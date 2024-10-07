@@ -9,10 +9,6 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        #error-message {
-            color: red;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -20,14 +16,11 @@
     <p id="location-status">Trying to fetch your location...</p>
     <p id="village-name"></p>
     <p id="ip-address"></p>
-    <div id="error-message"></div>
 
     <script>
         const weatherApiKey = '74037a84a785450abf9190335241409'; // Your weather API key
         const weatherApiUrl = 'https://api.openweathermap.org/data/2.5/weather';
         const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse'; // Nominatim API for reverse geocoding
-
-        let isRequestInProgress = false; // Prevent multiple requests
 
         function getGeoLocation() {
             if (navigator.geolocation) {
@@ -43,27 +36,28 @@
                     }
                 );
             } else {
-                showError("Geolocation is not supported by your browser.");
+                document.getElementById('location-status').innerText = "Geolocation is not supported by your browser.";
             }
         }
 
         function fetchVillageName(lat, long) {
-            if (isRequestInProgress) return; // Prevent duplicate requests
-            isRequestInProgress = true; // Set flag to true
-
+            // Fetch weather data
             const weatherUrl = `${weatherApiUrl}?lat=${lat}&lon=${long}&appid=${weatherApiKey}&units=metric`;
 
             fetch(weatherUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`Weather API error: ${response.statusText}`);
+                        throw new Error('Network response was not ok: ' + response.statusText);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Weather API Response:', data);
+                    console.log('Weather API Response:', data); // Log the API response
 
-                    const village = data.name || 'unknown';
+                    // Attempt to get the village name from the weather API
+                    const village = data.name || 'unknown'; // Default to 'unknown' if the name is not available
+
+                    // If the village name is 'unknown', use Nominatim to reverse geocode the coordinates
                     if (village === 'unknown') {
                         return fetchVillageFromCoordinates(lat, long);
                     } else {
@@ -74,11 +68,8 @@
                 })
                 .catch(error => {
                     console.error('Error fetching the village name from Weather API:', error);
-                    showError("Failed to retrieve village name from Weather API. Attempting Nominatim...");
-                    fetchVillageFromCoordinates(lat, long);
-                })
-                .finally(() => {
-                    isRequestInProgress = false; // Reset the flag after request completes
+                    document.getElementById('village-name').innerText = "Failed to retrieve village name. Attempting Nominatim...";
+                    fetchVillageFromCoordinates(lat, long); // Fallback to Nominatim if weather API fails
                 });
         }
 
@@ -88,51 +79,41 @@
             fetch(reverseGeocodeUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`Nominatim API error: ${response.statusText}`);
+                        throw new Error('Network response was not ok: ' + response.statusText);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Nominatim API Response:', data);
+                    console.log('Nominatim API Response:', data); // Log the Nominatim API response
+
+                    // Check if data is returned correctly
                     if (data && data.display_name) {
                         document.getElementById('village-name').innerText = `Village Name: ${data.display_name}`;
                     } else {
-                        showError("Failed to retrieve village name.");
+                        document.getElementById('village-name').innerText = "Failed to retrieve village name.";
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching the village name from Nominatim API:', error);
-                    showError("Failed to retrieve village name from Nominatim API.");
+                    document.getElementById('village-name').innerText = "Failed to retrieve village name.";
                 });
         }
 
         function handleGeoError(error) {
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    showError("User denied the request for Geolocation. The application will now close.");
-                    disableApp();
+                    document.getElementById('location-status').innerText = "User denied the request for Geolocation.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    showError("Location information is unavailable.");
+                    document.getElementById('location-status').innerText = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    showError("The request to get user location timed out.");
+                    document.getElementById('location-status').innerText = "The request to get user location timed out.";
                     break;
                 case error.UNKNOWN_ERROR:
-                    showError("An unknown error occurred.");
+                    document.getElementById('location-status').innerText = "An unknown error occurred.";
                     break;
             }
-        }
-
-        function showError(message) {
-            document.getElementById('error-message').innerText = message;
-        }
-
-        function disableApp() {
-            // Disable user interaction
-            document.getElementById('location-status').innerText = "";
-            document.getElementById('village-name').innerText = "";
-            document.getElementById('ip-address').innerText = "";
         }
 
         // Automatically trigger geolocation fetch on page load
