@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geolocation and Village Name Fetcher</title>
+    <title>Location Fetcher with Nominatim</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,28 +12,27 @@
 
         /* Modal styles */
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0, 0, 0); /* Fallback color */
-            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-            padding-top: 60px; /* Location of the box */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 5% auto; /* 15% from the top and centered */
+            margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
-            max-width: 500px; /* Max width for larger screens */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .close {
@@ -56,29 +55,58 @@
     </style>
 </head>
 <body>
-    <h1>Geolocation and Village Name Fetcher</h1>
-    <p id="location-status">Trying to fetch your location...</p>
+    <h1>Enhanced Location Fetcher</h1>
+    <p id="location-status">Fetching your location...</p>
     <p id="village-name"></p>
-    <p id="ip-address"></p>
 
-    <!-- The Modal -->
+    <!-- Modal for Location Instructions -->
     <div id="locationModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeModal">&times;</span>
-            <h2>Location Services Required</h2>
-            <p>To provide the best experience, please enable location services on your device.</p>
-            <p>This application needs access to your location to function properly.</p>
-            <button id="enableLocationButton">Enable Location</button>
+            <h2>Enable Location Services</h2>
+            <p id="instruction-text"></p>
+            <button id="openSettingsButton">Open Location Settings</button>
         </div>
     </div>
 
     <script>
-        const weatherApiKey = '74037a84a785450abf9190335241409'; // Your weather API key
-        const weatherApiUrl = 'https://api.openweathermap.org/data/2.5/weather';
         const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse'; // Nominatim API for reverse geocoding
         const locationModal = document.getElementById('locationModal');
         const closeModal = document.getElementById('closeModal');
-        const enableLocationButton = document.getElementById('enableLocationButton');
+        const openSettingsButton = document.getElementById('openSettingsButton');
+        const instructionText = document.getElementById('instruction-text');
+        
+        function detectDeviceType() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) {
+                return 'Android';
+            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return 'iOS';
+            } else {
+                return 'Desktop';
+            }
+        }
+
+        function showLocationModal() {
+            const deviceType = detectDeviceType();
+            let instructions;
+
+            if (deviceType === 'Android') {
+                instructions = 'To enable location services, go to Settings > Location and turn it on.';
+            } else if (deviceType === 'iOS') {
+                instructions = 'To enable location services, go to Settings > Privacy > Location Services and turn it on.';
+            } else {
+                instructions = 'Please enable location services in your browser settings to proceed.';
+            }
+
+            instructionText.innerText = instructions;
+            locationModal.style.display = 'block';
+
+            // Trigger an alert to get user's attention on mobile
+            if (deviceType === 'Android' || deviceType === 'iOS') {
+                navigator.vibrate(200); // Vibrates for 200ms on mobile devices
+            }
+        }
 
         function getGeoLocation() {
             if (navigator.geolocation) {
@@ -99,39 +127,6 @@
         }
 
         function fetchVillageName(lat, long) {
-            // Fetch weather data
-            const weatherUrl = `${weatherApiUrl}?lat=${lat}&lon=${long}&appid=${weatherApiKey}&units=metric`;
-
-            fetch(weatherUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Weather API Response:', data); // Log the API response
-
-                    // Attempt to get the village name from the weather API
-                    const village = data.name || 'unknown'; // Default to 'unknown' if the name is not available
-
-                    // If the village name is 'unknown', use Nominatim to reverse geocode the coordinates
-                    if (village === 'unknown') {
-                        return fetchVillageFromCoordinates(lat, long);
-                    } else {
-                        const country = data.sys.country; // Country code from the API
-                        document.getElementById('village-name').innerText = `Village Name: ${village}`;
-                        document.getElementById('ip-address').innerText = `Country Code: ${country}`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching the village name from Weather API:', error);
-                    document.getElementById('village-name').innerText = "Failed to retrieve village name. Attempting Nominatim...";
-                    fetchVillageFromCoordinates(lat, long); // Fallback to Nominatim if weather API fails
-                });
-        }
-
-        function fetchVillageFromCoordinates(lat, long) {
             const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${long}&format=json&accept-language=en`;
 
             fetch(reverseGeocodeUrl)
@@ -142,9 +137,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Nominatim API Response:', data); // Log the Nominatim API response
-
-                    // Check if data is returned correctly
                     if (data && data.display_name) {
                         document.getElementById('village-name').innerText = `Village Name: ${data.display_name}`;
                     } else {
@@ -152,7 +144,7 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching the village name from Nominatim API:', error);
+                    console.error('Error fetching the village name:', error);
                     document.getElementById('village-name').innerText = "Failed to retrieve village name.";
                 });
         }
@@ -174,24 +166,18 @@
             }
         }
 
-        function showLocationModal() {
-            locationModal.style.display = "block";
-        }
-
         closeModal.onclick = function() {
             locationModal.style.display = "none"; // Close the modal when the user clicks on <span> (x)
         }
 
-        enableLocationButton.onclick = function() {
-            // Attempt to re-fetch the location
-            getGeoLocation();
+        openSettingsButton.onclick = function() {
             locationModal.style.display = "none"; // Close the modal
+            // Try fetching the location again, after the user enables it
+            getGeoLocation();
         }
 
-        // Automatically trigger geolocation fetch on page load
         window.onload = getGeoLocation;
 
-        // Close the modal when clicking anywhere outside of it
         window.onclick = function(event) {
             if (event.target == locationModal) {
                 locationModal.style.display = "none";
