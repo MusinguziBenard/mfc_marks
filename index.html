@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Fetcher with Nominatim</title>
+    <title>Real-Time Location Services Prompt</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,12 +52,26 @@
         #location-status {
             margin-top: 20px;
         }
+
+        #retry {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #retry:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
-    <h1>Enhanced Location Fetcher</h1>
-    <p id="location-status">Fetching your location...</p>
+    <h1>Real-Time Location Fetcher</h1>
+    <p id="location-status">Checking location services...</p>
     <p id="village-name"></p>
+    <button id="retry" style="display: none;">Try Again</button>
 
     <!-- Modal for Location Instructions -->
     <div id="locationModal" class="modal">
@@ -65,77 +79,69 @@
             <span class="close" id="closeModal">&times;</span>
             <h2>Enable Location Services</h2>
             <p id="instruction-text"></p>
-            <button id="openSettingsButton">Open Location Settings</button>
         </div>
     </div>
 
     <script>
-        const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse'; // Nominatim API for reverse geocoding
+        const locationStatus = document.getElementById('location-status');
+        const retryButton = document.getElementById('retry');
         const locationModal = document.getElementById('locationModal');
         const closeModal = document.getElementById('closeModal');
-        const openSettingsButton = document.getElementById('openSettingsButton');
-        const instructionText = document.getElementById('instruction-text');
-        
-        function detectDeviceType() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            if (/android/i.test(userAgent)) {
-                return 'Android';
-            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                return 'iOS';
-            } else {
-                return 'Desktop';
+
+        let locationWatchId;
+
+        // Monitor permission status
+        function checkPermissionStatus() {
+            navigator.permissions.query({ name: 'geolocation' }).then(permission => {
+                permission.onchange = () => {
+                    handlePermissionChange(permission.state);
+                };
+                handlePermissionChange(permission.state);
+            });
+        }
+
+        // Handle permission changes (prompt user or re-enable services)
+        function handlePermissionChange(state) {
+            if (state === 'granted') {
+                retryButton.style.display = 'none'; // No need to retry
+                getGeoLocation();
+            } else if (state === 'denied') {
+                retryButton.style.display = 'block';
+                locationStatus.innerText = 'Location permission denied. Please enable location.';
+            } else if (state === 'prompt') {
+                retryButton.style.display = 'block';
+                locationStatus.innerText = 'Please allow location access.';
             }
         }
 
-        function showLocationModal() {
-            const deviceType = detectDeviceType();
-            let instructions;
-
-            if (deviceType === 'Android') {
-                instructions = 'To enable location services, go to Settings > Location and turn it on.';
-            } else if (deviceType === 'iOS') {
-                instructions = 'To enable location services, go to Settings > Privacy > Location Services and turn it on.';
-            } else {
-                instructions = 'Please enable location services in your browser settings to proceed.';
-            }
-
-            instructionText.innerText = instructions;
-            locationModal.style.display = 'block';
-
-            // Trigger an alert to get user's attention on mobile
-            if (deviceType === 'Android' || deviceType === 'iOS') {
-                navigator.vibrate(200); // Vibrates for 200ms on mobile devices
-            }
-        }
-
+        // Fetch geolocation
         function getGeoLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
+                locationStatus.innerText = 'Fetching your location...';
+
+                locationWatchId = navigator.geolocation.watchPosition(
                     (position) => {
                         const lat = position.coords.latitude;
                         const long = position.coords.longitude;
-                        document.getElementById('location-status').innerText = `Coordinates: Latitude ${lat}, Longitude ${long}`;
+                        locationStatus.innerText = `Coordinates: Latitude ${lat}, Longitude ${long}`;
                         fetchVillageName(lat, long);
                     },
                     (error) => {
                         handleGeoError(error);
-                    }
+                    },
+                    { enableHighAccuracy: true }
                 );
             } else {
-                document.getElementById('location-status').innerText = "Geolocation is not supported by your browser.";
+                locationStatus.innerText = "Geolocation is not supported by your browser.";
             }
         }
 
+        // Fetch village name using Nominatim API
         function fetchVillageName(lat, long) {
-            const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${long}&format=json&accept-language=en`;
+            const reverseGeocodeUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json`;
 
             fetch(reverseGeocodeUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     if (data && data.display_name) {
                         document.getElementById('village-name').innerText = `Village Name: ${data.display_name}`;
@@ -149,40 +155,36 @@
                 });
         }
 
+        // Handle geolocation errors
         function handleGeoError(error) {
-            switch(error.code) {
+            switch (error.code) {
                 case error.PERMISSION_DENIED:
-                    showLocationModal();
+                    locationStatus.innerText = "Permission denied. Please allow location access.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    document.getElementById('location-status').innerText = "Location information is unavailable.";
+                    locationStatus.innerText = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    document.getElementById('location-status').innerText = "The request to get user location timed out.";
+                    locationStatus.innerText = "Request to get location timed out.";
                     break;
-                case error.UNKNOWN_ERROR:
-                    document.getElementById('location-status').innerText = "An unknown error occurred.";
+                default:
+                    locationStatus.innerText = "An unknown error occurred.";
                     break;
             }
         }
 
+        // Retry button to re-fetch location
+        retryButton.onclick = function () {
+            checkPermissionStatus();
+        };
+
+        // Check for permission status changes in real time
+        checkPermissionStatus();
+
+        // Close modal event
         closeModal.onclick = function() {
-            locationModal.style.display = "none"; // Close the modal when the user clicks on <span> (x)
-        }
-
-        openSettingsButton.onclick = function() {
-            locationModal.style.display = "none"; // Close the modal
-            // Try fetching the location again, after the user enables it
-            getGeoLocation();
-        }
-
-        window.onload = getGeoLocation;
-
-        window.onclick = function(event) {
-            if (event.target == locationModal) {
-                locationModal.style.display = "none";
-            }
-        }
+            locationModal.style.display = "none";
+        };
     </script>
 </body>
 </html>
