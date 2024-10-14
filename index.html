@@ -87,9 +87,12 @@
                     const region = data.address.region || district; // If region is not available, fallback to district
                     const country = data.address.country || '';
 
-                    // Construct full location from available data
+                    // Construct full location from available data without redundancy
+                    let locationParts = [village, parish, subCounty, county, district, region, country].filter(Boolean);
+                    fullLocation = locationParts.join(', ');
+
+                    // Assign villageName for weather query
                     villageName = village || subCounty || county || 'Unknown';
-                    fullLocation = `${village ? village + ', ' : ''}${parish ? parish + ', ' : ''}${subCounty ? subCounty + ', ' : ''}${county ? county + ', ' : ''}${district ? district + ', ' : ''}${region ? region + ', ' : ''}${country}`;
 
                     document.getElementById('location-info').innerText = `You are at: ${fullLocation}`;
                     fetchWeatherData(villageName, country);
@@ -109,13 +112,13 @@
             fetch(currentWeatherUrl)
                 .then(response => response.json())
                 .then(data => {
-                    if (data && data.weather) {
+                    if (data.cod === 200 && data.weather) {
                         const description = data.weather[0].description;
                         const temp = data.main.temp;
                         document.getElementById('current-weather').innerText = `Weather: ${description}, Temperature: ${temp}°C`;
                         changeBackground(data.weather[0].main);
                     } else {
-                        document.getElementById('current-weather').innerText = "Failed to retrieve current weather.";
+                        document.getElementById('current-weather').innerText = "Failed to retrieve current weather. Please check the location.";
                     }
                 })
                 .catch(() => {
@@ -126,7 +129,7 @@
             fetch(forecastWeatherUrl)
                 .then(response => response.json())
                 .then(data => {
-                    if (data && data.list) {
+                    if (data.cod === "200" && data.list) {
                         let forecastHtml = '';
                         data.list.forEach((forecast, index) => {
                             if (index % 8 === 0) { // Display one forecast per day
@@ -138,7 +141,7 @@
                         });
                         document.getElementById('forecast').innerHTML = forecastHtml;
                     } else {
-                        document.getElementById('forecast').innerText = "Failed to retrieve forecast.";
+                        document.getElementById('forecast').innerText = "Failed to retrieve forecast. Please check the location.";
                     }
                 })
                 .catch(() => {
