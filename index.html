@@ -3,415 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Location Services Prompt</title>
+    <title>Weather Forecast App</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff, #e6e9ef);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        #location-status {
-            margin-top: 20px;
-        }
-
-        #retry {
-            background-color: #4CAF50;
+        header {
+            background-color: #4caf50;
             color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .weather, .forecast {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .weather-info, .forecast-info {
+            text-align: center;
+            margin: 10px 0;
             padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
-        #retry:hover {
-            background-color: #45a049;
+        #current-weather {
+            font-size: 1.2rem;
         }
 
+        #forecast {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
 
+        .forecast-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 30%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
+        .forecast-item h4 {
+            font-size: 1.2rem;
+            color: #4caf50;
+        }
 
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
 
-        /* Universal Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
+        @media (max-width: 768px) {
+            #forecast {
+                flex-direction: column;
+                align-items: center;
+            }
 
-body {
-  background: linear-gradient(135deg, #f0f8ff, #e6e9ef);
-  color: #333;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* Header Styles */
-header {
-  background: #3b82f6;
-  color: white;
-  padding: 15px 0;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-header h1 {
-  font-size: 2.2rem;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-header nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-header nav ul li a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-header nav ul li a:hover {
-  color: #fca311;
-}
-
-/* Button Styles */
-button, .btn {
-  display: inline-block;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 8px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-button:hover, .btn:hover {
-  background-color: #2563eb;
-  transform: translateY(-2px);
-}
-
-button:active, .btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Form Styles */
-form {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: 40px auto;
-}
-
-form h2 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-
-input:focus, select:focus, textarea:focus {
-  border-color: #3b82f6;
-  outline: none;
-}
-
-label {
-  font-size: 1rem;
-  margin-bottom: 5px;
-  display: block;
-  color: #555;
-}
-
-input[type="submit"] {
-  background-color: #3b82f6;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-input[type="submit"]:hover {
-  background-color: #2563eb;
-}
-
-/* Cards and Containers */
-.card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #3b82f6;
-}
-
-.card p {
-  font-size: 1rem;
-  color: #555;
-  line-height: 1.8;
-}
-
-/* Footer Styles */
-footer {
-  background: #333;
-  color: white;
-  padding: 20px;
-  text-align: center;
-}
-
-footer p {
-  margin: 0;
-  font-size: 1rem;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.6s ease-out;
-}
-
-input[type="submit"], .btn {
-  animation: fadeIn 0.6s ease-out;
-}
-
-header, form, .card {
-  animation: fadeIn 1s ease-in;
-}
-
-/* Mobile Styles */
-@media (max-width: 768px) {
-  header h1 {
-    font-size: 1.8rem;
-  }
-
-  header nav ul {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  form {
-    padding: 20px;
-  }
-
-  .card {
-    margin-bottom: 15px;
-  }
-}
-        
+            .forecast-item {
+                width: 90%;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Real-Time Location Fetcher</h1>
-    <p id="location-status">Checking location services...</p>
-    <p id="village-name"></p>
-    <button id="retry" style="display: none;">Try Again</button>
 
-    <!-- Modal for Location Instructions -->
-    <div id="locationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h2>Enable Location Services</h2>
-            <p id="instruction-text"></p>
-        </div>
-    </div>
+<header>Weather Forecast App</header>
 
-    <script>
-        const locationStatus = document.getElementById('location-status');
-        const retryButton = document.getElementById('retry');
-        const locationModal = document.getElementById('locationModal');
-        const closeModal = document.getElementById('closeModal');
+<div class="container">
+    <section class="weather">
+        <h2>Current Weather</h2>
+        <div id="current-weather" class="weather-info">Fetching current weather...</div>
+    </section>
+    
+    <section class="forecast">
+        <h2>5-Day Weather Forecast</h2>
+        <div id="forecast" class="forecast-info">Fetching forecast...</div>
+    </section>
+</div>
 
-        let locationWatchId;
+<footer>&copy; 2024 Weather App</footer>
 
-        // Monitor permission status
-        function checkPermissionStatus() {
-            navigator.permissions.query({ name: 'geolocation' }).then(permission => {
-                permission.onchange = () => {
-                    handlePermissionChange(permission.state);
-                };
-                handlePermissionChange(permission.state);
+<script>
+    const apiKey = 'YOUR_OPENWEATHERMAP_API_KEY';
+    let userLatitude, userLongitude;
+
+    function getWeatherData(lat, lon) {
+        const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+
+        fetch(currentWeatherUrl)
+            .then(response => response.json())
+            .then(data => displayCurrentWeather(data));
+
+        fetch(forecastUrl)
+            .then(response => response.json())
+            .then(data => displayForecast(data));
+    }
+
+    function displayCurrentWeather(data) {
+        const weatherInfo = document.getElementById('current-weather');
+        const { main, weather, name } = data;
+        weatherInfo.innerHTML = `
+            <h3>Weather in ${name}</h3>
+            <p><strong>Temperature:</strong> ${main.temp}°C</p>
+            <p><strong>Weather:</strong> ${weather[0].description}</p>
+            <p><strong>Humidity:</strong> ${main.humidity}%</p>
+            <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
+        `;
+    }
+
+    function displayForecast(data) {
+        const forecastContainer = document.getElementById('forecast');
+        forecastContainer.innerHTML = '';
+        const forecastList = data.list.filter((_, index) => index % 8 === 0);
+        forecastList.forEach(forecast => {
+            const { main, weather, dt_txt } = forecast;
+            const date = new Date(dt_txt).toDateString();
+            forecastContainer.innerHTML += `
+                <div class="forecast-item">
+                    <h4>${date}</h4>
+                    <p><strong>Temperature:</strong> ${main.temp}°C</p>
+                    <p><strong>Weather:</strong> ${weather[0].description}</p>
+                </div>
+            `;
+        });
+    }
+
+    function initLocationSync() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(position => {
+                const { latitude, longitude } = position.coords;
+                userLatitude = latitude;
+                userLongitude = longitude;
+                getWeatherData(userLatitude, userLongitude);
+            }, error => {
+                alert("Unable to retrieve location. Please enable location services.");
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000
             });
+        } else {
+            alert('Geolocation is not supported by this browser.');
         }
+    }
 
-        // Handle permission changes (prompt user or re-enable services)
-        function handlePermissionChange(state) {
-            if (state === 'granted') {
-                retryButton.style.display = 'none'; // No need to retry
-                getGeoLocation();
-            } else if (state === 'denied') {
-                retryButton.style.display = 'block';
-                locationStatus.innerText = 'Location permission denied. Please enable location.';
-            } else if (state === 'prompt') {
-                retryButton.style.display = 'block';
-                locationStatus.innerText = 'Please allow location access.';
-            }
-        }
+    window.onload = initLocationSync;
+</script>
 
-        // Fetch geolocation
-        function getGeoLocation() {
-            if (navigator.geolocation) {
-                locationStatus.innerText = 'Fetching your location...';
-
-                locationWatchId = navigator.geolocation.watchPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const long = position.coords.longitude;
-                        locationStatus.innerText = `Coordinates: Latitude ${lat}, Longitude ${long}`;
-                        fetchVillageName(lat, long);
-                    },
-                    (error) => {
-                        handleGeoError(error);
-                    },
-                    { enableHighAccuracy: true }
-                );
-            } else {
-                locationStatus.innerText = "Geolocation is not supported by your browser.";
-            }
-        }
-
-        // Fetch village name using Nominatim API
-        function fetchVillageName(lat, long) {
-            const reverseGeocodeUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json`;
-
-            fetch(reverseGeocodeUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.display_name) {
-                        document.getElementById('village-name').innerText = `Village Name: ${data.display_name}`;
-                    } else {
-                        document.getElementById('village-name').innerText = "Failed to retrieve village name.";
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching the village name:', error);
-                    document.getElementById('village-name').innerText = "Failed to retrieve village name.";
-                });
-        }
-
-        // Handle geolocation errors
-        function handleGeoError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    locationStatus.innerText = "Permission denied. Please allow location access.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    locationStatus.innerText = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    locationStatus.innerText = "Request to get location timed out.";
-                    break;
-                default:
-                    locationStatus.innerText = "An unknown error occurred.";
-                    break;
-            }
-        }
-
-        // Retry button to re-fetch location
-        retryButton.onclick = function () {
-            checkPermissionStatus();
-        };
-
-        // Check for permission status changes in real time
-        checkPermissionStatus();
-
-        // Close modal event
-        closeModal.onclick = function() {
-            locationModal.style.display = "none";
-        };
-    </script>
 </body>
 </html>
