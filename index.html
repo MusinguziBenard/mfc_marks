@@ -78,15 +78,18 @@
             fetch(reverseGeocodeUrl)
                 .then(response => response.json())
                 .then(data => {
-                    // Construct full location from available data
+                    // Extract detailed location information
                     const village = data.address.village || '';
-                    const town = data.address.town || '';
-                    const city = data.address.city || '';
-                    const state = data.address.state || '';
+                    const parish = data.address.hamlet || '';
+                    const subCounty = data.address.suburb || '';
+                    const county = data.address.county || '';
+                    const district = data.address.state || '';
+                    const region = data.address.region || district; // If region is not available, fallback to district
                     const country = data.address.country || '';
-                    
-                    villageName = village || town || city || 'Unknown';
-                    fullLocation = `${village ? village + ', ' : ''}${town ? town + ', ' : ''}${city ? city + ', ' : ''}${state ? state + ', ' : ''}${country}`;
+
+                    // Construct full location from available data
+                    villageName = village || subCounty || county || 'Unknown';
+                    fullLocation = `${village ? village + ', ' : ''}${parish ? parish + ', ' : ''}${subCounty ? subCounty + ', ' : ''}${county ? county + ', ' : ''}${district ? district + ', ' : ''}${region ? region + ', ' : ''}${country}`;
 
                     document.getElementById('location-info').innerText = `You are at: ${fullLocation}`;
                     fetchWeatherData(villageName, country);
