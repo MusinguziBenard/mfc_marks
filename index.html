@@ -6,116 +6,68 @@
     <title>Weather and Location App</title>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f4ff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: white;
-            width: 100%;
-            max-width: 600px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
-
         h1 {
-            font-size: 2rem;
-            color: #333;
+            color: #ff9800;
         }
-
-        .location, .weather-info, .forecast-info {
-            margin-bottom: 20px;
+        .weather-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e0f7fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        .location-info {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .current-weather {
-            font-size: 1.8rem;
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .weather-status {
-            margin: 10px 0;
-            font-size: 1.1rem;
-        }
-
-        .forecast {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .forecast-item {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            width: 30%;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .forecast-item h3 {
-            font-size: 1rem;
-        }
-
-        .forecast-item p {
-            margin: 5px 0;
+        .error {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Weather and Location App</h1>
-        <div class="location">
-            <h2>Your Location</h2>
-            <p id="location-info">Fetching location...</p>
-        </div>
-
-        <div class="weather-info">
-            <h2>Current Weather</h2>
-            <div id="current-weather" class="current-weather">Loading weather...</div>
-        </div>
-
-        <div class="forecast-info">
-            <h2>5-Day Forecast</h2>
-            <div id="forecast" class="forecast"></div>
-        </div>
+    <h1>Weather and Location App</h1>
+    
+    <div class="location">
+        <h2>Your Location</h2>
+        <p id="location-info">Fetching location...</p>
+    </div>
+    
+    <div class="weather-info">
+        <h2>Current Weather</h2>
+        <p id="current-weather">Loading...</p>
+    </div>
+    
+    <div class="weather-info">
+        <h2>5-Day Forecast</h2>
+        <p id="forecast">Loading...</p>
     </div>
 
     <script>
         const weatherApiKey = '74037a84a785450abf9190335241409';
-        const weatherApiUrl = 'https://api.openweathermap.org/data/2.5/';
+        const weatherApiUrl = 'https://api.openweathermap.org/data/2.5';
         const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse';
-        let lat, lon, village;
+
+        let villageName = '';
 
         function getGeoLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(
+                navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        lat = position.coords.latitude;
-                        lon = position.coords.longitude;
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
                         fetchVillageName(lat, lon);
                     },
                     (error) => {
-                        document.getElementById('location-info').innerText = "Unable to fetch location.";
-                        console.error("Error fetching geolocation:", error);
+                        document.getElementById('location-info').innerText = "Failed to retrieve location.";
+                        document.getElementById('location-info').classList.add('error');
                     }
                 );
             } else {
-                document.getElementById('location-info').innerText = "Geolocation not supported by your browser.";
+                document.getElementById('location-info').innerText = "Geolocation is not supported by your browser.";
+                document.getElementById('location-info').classList.add('error');
             }
         }
 
@@ -125,96 +77,89 @@
             fetch(reverseGeocodeUrl)
                 .then(response => response.json())
                 .then(data => {
-                    village = data.address.village || data.address.town || data.address.city || 'Unknown location';
-                    document.getElementById('location-info').innerText = `You are at: ${village}`;
-                    fetchWeatherData(village);
+                    villageName = data.address.village || data.address.town || data.address.city || 'Unknown Location';
+                    document.getElementById('location-info').innerText = `You are at: ${villageName}`;
+                    fetchWeatherData(villageName);
                 })
-                .catch(error => {
-                    console.error("Error fetching village name:", error);
+                .catch(() => {
                     document.getElementById('location-info').innerText = "Failed to retrieve village name.";
+                    document.getElementById('location-info').classList.add('error');
                 });
         }
 
-        function fetchWeatherData(village) {
-            const currentWeatherUrl = `${weatherApiUrl}weather?q=${village}&appid=${weatherApiKey}&units=metric`;
-            const forecastWeatherUrl = `${weatherApiUrl}forecast?q=${village}&appid=${weatherApiKey}&units=metric`;
+        function fetchWeatherData(villageName) {
+            const currentWeatherUrl = `${weatherApiUrl}/weather?q=${villageName}&appid=${weatherApiKey}&units=metric`;
+            const forecastWeatherUrl = `${weatherApiUrl}/forecast?q=${villageName}&appid=${weatherApiKey}&units=metric`;
 
+            // Fetch current weather
             fetch(currentWeatherUrl)
                 .then(response => response.json())
                 .then(data => {
-                    const temperature = data.main.temp;
-                    const description = data.weather[0].description;
-                    const condition = data.weather[0].main;
-                    const weatherDiv = document.getElementById('current-weather');
-                    weatherDiv.innerHTML = `Temperature: ${temperature}°C<br>Status: ${description}`;
-
-                    // Change background color based on condition
-                    changeBackgroundColor(condition);
+                    if (data && data.weather) {
+                        const description = data.weather[0].description;
+                        const temp = data.main.temp;
+                        document.getElementById('current-weather').innerText = `Weather: ${description}, Temperature: ${temp}°C`;
+                        changeBackground(data.weather[0].main);
+                    } else {
+                        document.getElementById('current-weather').innerText = "Failed to retrieve current weather.";
+                    }
                 })
-                .catch(error => {
-                    console.error("Error fetching current weather:", error);
+                .catch(() => {
                     document.getElementById('current-weather').innerText = "Failed to retrieve current weather.";
                 });
 
+            // Fetch 5-day forecast
             fetch(forecastWeatherUrl)
                 .then(response => response.json())
                 .then(data => {
-                    const forecastDiv = document.getElementById('forecast');
-                    forecastDiv.innerHTML = ''; // Clear old forecast
-
-                    data.list.slice(0, 5).forEach(forecast => {
-                        const date = new Date(forecast.dt_txt).toLocaleDateString();
-                        const temp = forecast.main.temp;
-                        const weather = forecast.weather[0].description;
-
-                        const forecastItem = `
-                            <div class="forecast-item">
-                                <h3>${date}</h3>
-                                <p>Temp: ${temp}°C</p>
-                                <p>${weather}</p>
-                            </div>
-                        `;
-                        forecastDiv.innerHTML += forecastItem;
-                    });
+                    if (data && data.list) {
+                        let forecastHtml = '';
+                        data.list.forEach((forecast, index) => {
+                            if (index % 8 === 0) { // Display one forecast per day
+                                const date = new Date(forecast.dt_txt).toLocaleDateString();
+                                const description = forecast.weather[0].description;
+                                const temp = forecast.main.temp;
+                                forecastHtml += `<p>${date}: ${description}, Temp: ${temp}°C</p>`;
+                            }
+                        });
+                        document.getElementById('forecast').innerHTML = forecastHtml;
+                    } else {
+                        document.getElementById('forecast').innerText = "Failed to retrieve forecast.";
+                    }
                 })
-                .catch(error => {
-                    console.error("Error fetching weather forecast:", error);
-                    document.getElementById('forecast').innerText = "Failed to retrieve weather forecast.";
+                .catch(() => {
+                    document.getElementById('forecast').innerText = "Failed to retrieve forecast.";
                 });
         }
 
-        function changeBackgroundColor(condition) {
+        function changeBackground(weatherCondition) {
             let bgColor;
-            switch (condition.toLowerCase()) {
+            switch (weatherCondition.toLowerCase()) {
                 case 'clear':
-                                        bgColor = '#87CEEB'; // Clear sky: light blue
+                    bgColor = '#87CEEB'; // Clear sky
                     break;
                 case 'clouds':
-                    bgColor = '#B0C4DE'; // Clouds: light gray-blue
+                    bgColor = '#B0C4DE'; // Cloudy
                     break;
                 case 'rain':
                 case 'drizzle':
-                    bgColor = '#1E90FF'; // Rain: blue
+                    bgColor = '#1E90FF'; // Rainy
                     break;
                 case 'thunderstorm':
-                    bgColor = '#483D8B'; // Thunderstorm: dark blue-purple
+                    bgColor = '#483D8B'; // Thunderstorm
                     break;
                 case 'snow':
-                    bgColor = '#FFFFFF'; // Snow: white
+                    bgColor = '#FFFFFF'; // Snowy
                     break;
                 default:
-                    bgColor = '#708090'; // Default: slate gray
+                    bgColor = '#708090'; // Default weather
                     break;
             }
-
             document.body.style.backgroundColor = bgColor;
         }
 
-        // Start the app
+        // Initialize the app
         getGeoLocation();
     </script>
-
 </body>
 </html>
-
-                    
