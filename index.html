@@ -51,6 +51,7 @@
         const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse';
 
         let villageName = '';
+        let fullLocation = '';
 
         function getGeoLocation() {
             if (navigator.geolocation) {
@@ -58,7 +59,7 @@
                     (position) => {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
-                        fetchVillageName(lat, lon);
+                        fetchFullLocation(lat, lon);
                     },
                     (error) => {
                         document.getElementById('location-info').innerText = "Failed to retrieve location.";
@@ -71,25 +72,35 @@
             }
         }
 
-        function fetchVillageName(lat, lon) {
+        function fetchFullLocation(lat, lon) {
             const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${lon}&format=json&accept-language=en`;
 
             fetch(reverseGeocodeUrl)
                 .then(response => response.json())
                 .then(data => {
-                    villageName = data.address.village || data.address.town || data.address.city || 'Unknown Location';
-                    document.getElementById('location-info').innerText = `You are at: ${villageName}`;
-                    fetchWeatherData(villageName);
+                    // Construct full location from available data
+                    const village = data.address.village || '';
+                    const town = data.address.town || '';
+                    const city = data.address.city || '';
+                    const state = data.address.state || '';
+                    const country = data.address.country || '';
+                    
+                    villageName = village || town || city || 'Unknown';
+                    fullLocation = `${village ? village + ', ' : ''}${town ? town + ', ' : ''}${city ? city + ', ' : ''}${state ? state + ', ' : ''}${country}`;
+
+                    document.getElementById('location-info').innerText = `You are at: ${fullLocation}`;
+                    fetchWeatherData(villageName, country);
                 })
                 .catch(() => {
-                    document.getElementById('location-info').innerText = "Failed to retrieve village name.";
+                    document.getElementById('location-info').innerText = "Failed to retrieve location.";
                     document.getElementById('location-info').classList.add('error');
                 });
         }
 
-        function fetchWeatherData(villageName) {
-            const currentWeatherUrl = `${weatherApiUrl}/weather?q=${villageName}&appid=${weatherApiKey}&units=metric`;
-            const forecastWeatherUrl = `${weatherApiUrl}/forecast?q=${villageName}&appid=${weatherApiKey}&units=metric`;
+        function fetchWeatherData(villageName, country) {
+            const locationQuery = `${villageName},${country}`;
+            const currentWeatherUrl = `${weatherApiUrl}/weather?q=${locationQuery}&appid=${weatherApiKey}&units=metric`;
+            const forecastWeatherUrl = `${weatherApiUrl}/forecast?q=${locationQuery}&appid=${weatherApiKey}&units=metric`;
 
             // Fetch current weather
             fetch(currentWeatherUrl)
