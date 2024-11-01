@@ -1,184 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather and Location App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-            padding: 20px;
-            transition: background-color 0.5s ease;
-        }
-        h1 {
-            color: #ff9800;
-        }
-        .weather-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e0f7fa;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Shopping Assistant</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      box-sizing: border-box;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    /* Fade-In Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      text-align: center;
+      color: #007bff;
+      font-size: 2em;
+      margin-bottom: 20px;
+      animation: slideDown 0.5s ease-in-out;
+    }
+
+    /* Slide-Down Animation */
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Form Styles */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, button {
+      padding: 12px;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, button:hover {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    input {
+      background-color: #f9f9f9;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* List Styles */
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    li {
+      background-color: #ffffff;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: slideIn 0.5s ease-in-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(-30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Button Group in List Items */
+    .buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .edit, .delete, .mark {
+      padding: 6px 12px;
+      font-size: 0.9em;
+      border-radius: 3px;
+      cursor: pointer;
+      border: none;
+      color: #ffffff;
+      transition: background-color 0.3s ease;
+    }
+
+    .edit {
+      background-color: #ffc107;
+    }
+
+    .edit:hover {
+      background-color: #e0a800;
+    }
+
+    .delete {
+      background-color: #dc3545;
+    }
+
+    .delete:hover {
+      background-color: #c82333;
+    }
+
+    .mark {
+      background-color: #28a745;
+    }
+
+    .mark:hover {
+      background-color: #218838;
+    }
+
+    /* Summary Section Styles */
+    #summary {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background-color: #f9f9f9;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-item {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .summary-item span {
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .summary-item.income span {
+      color: #28a745; /* Green for income */
+    }
+
+    .summary-item.expense span {
+      color: #dc3545; /* Red for expense */
+    }
+
+    /* Budget Modal Styles */
+    #budget-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #budget-content {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    #budget-content h2 {
+      margin-top: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      #app {
+        padding: 15px;
+        width: 100%;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      #budget-content {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Weather and Location App</h1>
-    
-    <div class="location">
-        <h2>Your Location</h2>
-        <p id="location-info">Fetching location...</p>
+  <div id="app">
+    <h1>Personal Shopping Assistant</h1>
+    <form id="item-form">
+      <input type="hidden" id="item-id">
+      <input type="text" id="name" placeholder="Item Name" required>
+      <input type="number" id="price" placeholder="Price (UGX)" required>
+      <button type="submit">Add Item</button>
+    </form>
+    <ul id="item-list"></ul>
+    <div id="summary">
+      <div class="summary-item">
+        Total Items: <span id="total-items">0</span>
+      </div>
+      <div class="summary-item">
+        Total Purchased: <span id="total-purchased">0</span>
+      </div>
+      <div class="summary-item">
+        Total Unpurchased: <span id="total-unpurchased">0</span>
+      </div>
+      <div class="summary-item">
+        Total Spent: <span id="total-spent">UGX 0</span>
+      </div>
+      <div class="summary-item">
+        Budget Remaining: <span id="budget-remaining">UGX 0</span>
+      </div>
+      <button onclick="openBudgetModal()">Set Budget</button>
     </div>
-    
-    <div class="weather-info">
-        <h2>Current Weather</h2>
-        <p id="current-weather">Loading...</p>
+  </div>
+
+  <div id="budget-modal">
+    <div id="budget-content">
+      <h2>Set Budget</h2>
+      <input type="number" id="budget-input" placeholder="Enter Budget (UGX)" required>
+      <button onclick="setBudget()">Save</button>
+      <button onclick="closeBudgetModal()">Cancel</button>
     </div>
-    
-    <div class="weather-info">
-        <h2>5-Day Forecast</h2>
-        <p id="forecast">Loading...</p>
-    </div>
+  </div>
 
-    <script>
-        const weatherApiKey = '74037a84a785450abf9190335241409';
-        const weatherApiUrl = 'https://api.openweathermap.org/data/2.5';
-        const nominatimApiUrl = 'https://nominatim.openstreetmap.org/reverse';
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+  <script>
+ let db;
+let budget = 0;
+const request = indexedDB.open('ShoppingAssistant', 1);
 
-        let villageName = '';
-        let fullLocation = '';
+request.onupgradeneeded = function(event) {
+  db = event.target.result;
+  const objectStore = db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
+  objectStore.createIndex('name', 'name', { unique: false });
+  objectStore.createIndex('price', 'price', { unique: false });
+  objectStore.createIndex('purchased', 'purchased', { unique: false });
+};
 
-        function getGeoLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        fetchFullLocation(lat, lon);
-                    },
-                    (error) => {
-                        document.getElementById('location-info').innerText = "Failed to retrieve location.";
-                        document.getElementById('location-info').classList.add('error');
-                    }
-                );
-            } else {
-                document.getElementById('location-info').innerText = "Geolocation is not supported by your browser.";
-                document.getElementById('location-info').classList.add('error');
-            }
-        }
+request.onsuccess = function(event) {
+  db = event.target.result;
 
-        function fetchFullLocation(lat, lon) {
-            const reverseGeocodeUrl = `${nominatimApiUrl}?lat=${lat}&lon=${lon}&format=json&accept-language=en`;
+  // Retrieve the budget from localStorage when the page loads
+  const storedBudget = localStorage.getItem('budget');
+  if (storedBudget) {
+    budget = parseFloat(storedBudget);
+    document.getElementById('budget-remaining').textContent = `UGX ${budget.toLocaleString()}`;
+  }
 
-            fetch(reverseGeocodeUrl)
-                .then(response => response.json())
-                .then(data => {
-                    // Extract detailed location information
-                    const village = data.address.village || '';
-                    const parish = data.address.hamlet || '';
-                    const subCounty = data.address.suburb || '';
-                    const county = data.address.county || '';
-                    const district = data.address.state || '';
-                    const region = data.address.region || district; // If region is not available, fallback to district
-                    const country = data.address.country || '';
+  displayItems();
+};
 
-                    // Construct full location from available data without redundancy
-                    let locationParts = [village, parish, subCounty, county, district, region, country].filter(Boolean);
-                    fullLocation = locationParts.join(', ');
+request.onerror = function(event) {
+  console.error('Database error:', event.target.errorCode);
+};
 
-                    // Assign villageName for weather query
-                    villageName = village || subCounty || county || 'Unknown';
+document.getElementById('item-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const name = document.getElementById('name').value;
+  const price = parseFloat(document.getElementById('price').value);
+  const itemId = parseInt(document.getElementById('item-id').value);
+  if (!name || isNaN(price) || price <= 0) {
+    Swal.fire('Error', 'Please enter a valid item name and price.', 'error');
+    return;
+  }
 
-                    document.getElementById('location-info').innerText = `You are at: ${fullLocation}`;
-                    // Fetch weather data only after the location has been retrieved
-                    fetchWeatherData(villageName, country);
-                })
-                .catch(() => {
-                    document.getElementById('location-info').innerText = "Failed to retrieve location.";
-                    document.getElementById('location-info').classList.add('error');
-                });
-        }
+  const transaction = db.transaction(['items'], 'readwrite');
+  const objectStore = transaction.objectStore('items');
 
-        function fetchWeatherData(villageName, country) {
-            const locationQuery = `${villageName}, ${country}`;
-            const currentWeatherUrl = `${weatherApiUrl}/weather?q=${locationQuery}&appid=${weatherApiKey}&units=metric`;
-            const forecastWeatherUrl = `${weatherApiUrl}/forecast?q=${locationQuery}&appid=${weatherApiKey}&units=metric`;
+  if (itemId) {
+    objectStore.get(itemId).onsuccess = function(event) {
+      const item = event.target.result;
+      item.name = name;
+      item.price = price;
+      item.purchased = false;
+      objectStore.put(item).onsuccess = function() {
+        Swal.fire('Success', 'Item updated successfully!', 'success');
+        displayItems();
+      };
+    };
+  } else {
+    const newItem = { name: name, price: price, purchased: false };
+    objectStore.add(newItem).onsuccess = function() {
+      Swal.fire('Success', 'Item added successfully!', 'success');
+      displayItems();
+    };
+  }
+});
 
-            // Fetch current weather
-            fetch(currentWeatherUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.cod === 200 && data.weather) {
-                        const description = data.weather[0].description;
-                        const temp = data.main.temp;
-                        document.getElementById('current-weather').innerText = `Weather: ${description}, Temperature: ${temp}°C`;
-                        changeBackground(data.weather[0].main);
-                    } else {
-                        document.getElementById('current-weather').innerText = "Failed to retrieve current weather. Please check the location.";
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('current-weather').innerText = "Failed to retrieve current weather.";
-                });
+function displayItems() {
+  const transaction = db.transaction(['items'], 'readonly');
+  const objectStore = transaction.objectStore('items');
+  const request = objectStore.openCursor();
+  const itemList = document.getElementById('item-list');
+  itemList.innerHTML = '';
 
-            // Fetch 5-day forecast
-            fetch(forecastWeatherUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.cod === "200" && data.list) {
-                        let forecastHtml = '';
-                        data.list.forEach((forecast, index) => {
-                            if (index % 8 === 0) { // Display one forecast per day
-                                const date = new Date(forecast.dt_txt).toLocaleDateString();
-                                const description = forecast.weather[0].description;
-                                const temp = forecast.main.temp;
-                                forecastHtml += `<p>${date}: ${description}, Temp: ${temp}°C</p>`;
-                            }
-                        });
-                        document.getElementById('forecast').innerHTML = forecastHtml;
-                    } else {
-                        document.getElementById('forecast').innerText = "Failed to retrieve forecast. Please check the location.";
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('forecast').innerText = "Failed to retrieve forecast.";
-                });
-        }
+  request.onsuccess = function(event) {
+    const cursor = event.target.result;
+    if (cursor) {
+      const item = cursor.value;
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        ${item.name} - UGX ${item.price}
+        <div class="buttons">
+          <button class="edit" onclick="editItem(${cursor.primaryKey})">Edit</button>
+          <button class="mark" onclick="markPurchased(${cursor.primaryKey})">${item.purchased ? 'Unmark' : 'Mark'} Purchased</button>
+          <button class="delete" onclick="deleteItem(${cursor.primaryKey})">Delete</button>
+        </div>
+      `;
+      itemList.appendChild(listItem);
+      cursor.continue();
+    } else {
+      updateSummary();
+    }
+  };
+}
 
-        function changeBackground(weatherCondition) {
-            let bgColor;
-            switch (weatherCondition.toLowerCase()) {
-                case 'clear':
-                    bgColor = '#87CEEB'; // Clear sky
-                    break;
-                case 'clouds':
-                    bgColor = '#B0C4DE'; // Cloudy
-                    break;
-                case 'rain':
-                case 'drizzle':
-                    bgColor = '#1E90FF'; // Rainy
-                    break;
-                case 'thunderstorm':
-                    bgColor = '#483D8B'; // Thunderstorm
-                    break;
-                case 'snow':
-                    bgColor = '#FFFFFF'; // Snowy
-                    break;
-                default:
-                    bgColor = '#708090'; // Default weather
-                    break;
-            }
-            document.body.style.backgroundColor = bgColor;
-        }
+function updateSummary() {
+  const transaction = db.transaction(['items'], 'readonly');
+  const objectStore = transaction.objectStore('items');
+  const request = objectStore.getAll();
+  let totalItems = 0;
+  let totalPurchased = 0;
+  let totalUnpurchased = 0;
+  let totalSpent = 0;
+  let totalBudget = parseFloat(localStorage.getItem('budget')) || 0;  // Retrieve budget from localStorage
 
-        // Initialize the app
-        getGeoLocation();
-    </script>
+  request.onsuccess = function(event) {
+    const items = event.target.result;
+    totalItems = items.length;
+    totalPurchased = items.filter(item => item.purchased).length;
+    totalUnpurchased = totalItems - totalPurchased;
+    totalSpent = items.reduce((sum, item) => sum + (item.purchased ? item.price : 0), 0);
+    document.getElementById('total-items').textContent = totalItems;
+    document.getElementById('total-purchased').textContent = totalPurchased;
+    document.getElementById('total-unpurchased').textContent = totalUnpurchased;
+    document.getElementById('total-spent').textContent = `UGX ${totalSpent.toLocaleString()}`;
+    const remainingBudget = Math.max(0, totalBudget - totalSpent);
+    document.getElementById('budget-remaining').textContent = `UGX ${remainingBudget.toLocaleString()}`;
+    if (remainingBudget <= 0) {
+      Swal.fire('Warning', 'Budget is exhausted!', 'warning');
+    }
+  };
+}
+
+function editItem(id) {
+  const transaction = db.transaction(['items'], 'readonly');
+  const objectStore = transaction.objectStore('items');
+  const request = objectStore.get(id);
+
+  request.onsuccess = function(event) {
+    const item = event.target.result;
+    document.getElementById('name').value = item.name;
+    document.getElementById('price').value = item.price;
+    document.getElementById('item-id').value = id;
+  };
+}
+
+function markPurchased(id) {
+  const transaction = db.transaction(['items'], 'readwrite');
+  const objectStore = transaction.objectStore('items');
+  const request = objectStore.get(id);
+
+  request.onsuccess = function(event) {
+    const item = event.target.result;
+    item.purchased = !item.purchased;
+    objectStore.put(item).onsuccess = function() {
+      Swal.fire('Success', item.purchased ? 'Item marked as purchased!' : 'Item unmarked as purchased!', 'success');
+      displayItems();
+    };
+  };
+}
+
+function deleteItem(id) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This item will be deleted permanently!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const transaction = db.transaction(['items'], 'readwrite');
+      const objectStore = transaction.objectStore('items');
+      objectStore.delete(id).onsuccess = function() {
+        Swal.fire('Deleted!', 'The item has been deleted.', 'success');
+        displayItems();
+      };
+    }
+  });
+}
+
+function openBudgetModal() {
+  document.getElementById('budget-modal').style.display = 'flex';
+}
+
+function closeBudgetModal() {
+  document.getElementById('budget-modal').style.display = 'none';
+}
+
+function setBudget() {
+  const budgetInput = parseFloat(document.getElementById('budget-input').value);
+  if (isNaN(budgetInput) || budgetInput <= 0) {
+    Swal.fire('Invalid Input', 'Please enter a positive budget amount.', 'error');
+    return;
+  }
+  budget = budgetInput;
+  localStorage.setItem('budget', budget);
+  document.getElementById('budget-remaining').textContent = `UGX ${budget.toLocaleString()}`;
+  closeBudgetModal();
+  updateSummary();
+}
+
+function markPurchased(itemId) {
+  const transaction = db.transaction(['items'], 'readwrite');
+  const objectStore = transaction.objectStore('items');
+  objectStore.get(itemId).onsuccess = function(event) {
+    const item = event.target.result;
+    const remainingBudget = parseFloat(localStorage.getItem('budget')) || 0;
+
+    if (!item.purchased && item.price > remainingBudget) {
+      Swal.fire('Warning', 'Insufficient budget to mark this item as purchased.', 'warning');
+      return;
+    }
+
+    item.purchased = !item.purchased;
+    objectStore.put(item).onsuccess = function() {
+      Swal.fire('Success', 'Item purchase status updated!', 'success');
+      displayItems();
+    };
+  };
+}
+
+function openBudgetModal() {
+  document.getElementById('budget-modal').style.display = 'flex';
+}
+
+function closeBudgetModal() {
+  document.getElementById('budget-modal').style.display = 'none';
+}
+
+function updateSummary() {
+  const transaction = db.transaction(['items'], 'readonly');
+  const objectStore = transaction.objectStore('items');
+  const request = objectStore.getAll();
+
+  request.onsuccess = function(event) {
+    const items = event.target.result;
+    const totalItems = items.length;
+    const totalPurchased = items.filter(item => item.purchased).length;
+    const totalSpent = items.reduce((sum, item) => sum + (item.purchased ? item.price : 0), 0);
+    const remainingBudget = budget - totalSpent;
+
+    document.getElementById('total-items').textContent = totalItems;
+    document.getElementById('total-purchased').textContent = totalPurchased;
+    document.getElementById('total-spent').textContent = `UGX ${totalSpent.toLocaleString()}`;
+    document.getElementById('budget-remaining').textContent = `UGX ${remainingBudget.toLocaleString()}`;
+    document.getElementById('budget-remaining').style.color = remainingBudget >= 0 ? '#28a745' : '#dc3545';
+  };
+}
+
+</script>
 </body>
 </html>
