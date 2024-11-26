@@ -3,473 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retail Shop Tracker</title>
+  <title>Text Reader and Audio Downloader</title>
   <style>
-    /* General Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f7f7f7;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-start;
       align-items: center;
       height: 100vh;
-      margin: 0;
+      padding: 10px;
       overflow: hidden;
-    }
-
-    #app {
-      background-color: #ffffff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 360px;
-      max-width: 100%;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    /* Fade-In Animation */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      position: relative;
     }
 
     h1 {
+      font-size: 2rem;
+      color: #333;
       text-align: center;
-      color: #007bff;
-      font-size: 2em;
       margin-bottom: 20px;
+      font-family: 'Arial', sans-serif;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #333;
+      animation: typing 4s steps(30) infinite, blink 2.75s step-end infinite;
     }
 
-    /* Form Styles */
-    form {
+    @keyframes typing {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
+
+    @keyframes blink {
+      50% {
+        border-color: transparent;
+      }
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 900px;
+      height: 400px;
+      padding: 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+      resize: none;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      font-family: 'Roboto', sans-serif;
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+    }
+
+    .controls {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 900px;
     }
 
-    input, select, button {
-      padding: 12px;
-      font-size: 1em;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      transition: all 0.3s ease;
-    }
-
-    input:focus, select:focus, button:hover {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    input {
-      background-color: #f9f9f9;
-    }
-
-    select {
-      background-color: #ffffff;
-    }
-
-    /* Button Styles */
     button {
-      background-color: #007bff;
-      color: #ffffff;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
       border: none;
+      background-color: #007bff;
+      color: white;
       cursor: pointer;
+      transition: background-color 0.3s;
+      font-family: 'Roboto', sans-serif;
     }
 
     button:hover {
       background-color: #0056b3;
     }
 
-    /* List Styles */
-    ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    li {
-      background-color: #ffffff;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      animation: slideIn 0.3s ease-in-out;
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(-100%);
-      }
-      to {
-        transform: translateX(0);
-      }
-    }
-
-    /* Button Group in List Items */
-    .buttons {
-      display: flex;
-      gap: 5px;
-    }
-
-    .edit, .delete {
-      padding: 6px 12px;
-      font-size: 0.9em;
-      border-radius: 3px;
-      cursor: pointer;
-      border: none;
-      color: #ffffff;
-      transition: background-color 0.3s ease;
-    }
-
-    .edit {
-      background-color: #ffc107;
-    }
-
-    .edit:hover {
-      background-color: #e0a800;
-    }
-
-    .delete {
-      background-color: #dc3545;
-    }
-
-    .delete:hover {
-      background-color: #c82333;
-    }
-
-    /* Summary Section Styles */
-    #summary {
-      margin-top: 20px;
-      padding-top: 10px;
-      border-top: 1px solid #ddd;
-    }
-
-    .summary-item {
-      margin-bottom: 10px;
-      font-size: 1.1em;
-    }
-
-    .summary-item span {
-      font-weight: bold;
-    }
-
-    /* Pagination Styles */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .pagination button {
-      padding: 10px;
-      margin: 0 5px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .pagination button:disabled {
+    button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
 
-    /* Responsive Design */
-    @media (max-width: 400px) {
-      #app {
-        padding: 20px;
-        width: 100%;
+    #audio-player {
+      margin-top: 20px;
+      max-width: 600px;
+      width: 100%;
+      display: none;
+    }
+
+    #loading {
+      font-size: 16px;
+      color: #333;
+      margin-top: 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .creator {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #007bff;
+      text-align: center;
+      width: 100%;
+      font-family: 'Arial', sans-serif;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
       }
 
-      h1 {
-        font-size: 1.5em;
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 250px;
       }
     }
-    
-    /* Summary Section Styles */
-#summary {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.summary-item {
-  margin-bottom: 15px;
-  font-size: 1.2em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.summary-item:last-child {
-  border-bottom: none;
-}
-
-.summary-item span {
-  font-weight: bold;
-  color: #007bff;
-}
-
-.summary-item.income span {
-  color: #28a745; /* Green for income */
-}
-
-.summary-item.expense span {
-  color: #dc3545; /* Red for expense */
-}
-
-
-#app {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 360px;
-  max-width: 100%;
-  animation: fadeIn 1s ease-in-out;
-  overflow-y: auto;
-  max-height: 100vh;
-}
-
-form {
-  position: sticky;
-  top: 0;
-  background-color: #ffffff;
-  z-index: 1;
-  padding-bottom: 10px;
-}
   </style>
 </head>
 <body>
-  <div id="app">
-    <h1>Retail Shop Tracker</h1>
-    <form id="transaction-form">
-      <input type="hidden" id="transaction-id">
-      <input type="text" id="description" placeholder="Description" required>
-      <input type="number" id="amount" placeholder="Amount (UGX)" required>
-      <select id="type" required>
-        <option value="" disabled selected>Select Type</option>
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-      <button type="submit">Add Transaction</button>
-    </form>
-    <ul id="transaction-list"></ul>
-    <div id="summary">
-      <div class="summary-item">Total Income: <span id="total-income">UGX 0</span></div>
-      <div class="summary-item">Total Expense: <span id="total-expense">UGX 0</span></div>
-      <div class="summary-item">Balance: <span id="balance">UGX 0</span></div>
-    </div>
-    <div class="pagination">
-      <button id="prev-page" onclick="prevPage()">Previous</button>
-      <span id="page-info">Page 1 of 1</span>
-      <button id="next-page" onclick="nextPage()">Next</button>
-    </div>
+  <h1>Type/paste Text Here to Read</h1>
+  <textarea id="text-input" placeholder="Paste or Enter your text here..."></textarea>
+  <div class="controls">
+    <button id="read-btn">Read Aloud</button>
+    <button id="stop-btn" disabled>Stop Reading</button> <!-- Stop button -->
+    <button id="download-btn" disabled>Download Audio</button>
   </div>
+  <audio id="audio-player" controls></audio>
+  <div id="loading" class="loading">Processing... Please wait.</div>
+  <div class="creator">Created by Benard CEO RocheCodeCamp.org</div>
+
   <script>
-    let db;
-    const request = indexedDB.open('RetailShopTracker', 1);
+    const textInput = document.getElementById('text-input');
+    const readBtn = document.getElementById('read-btn');
+    const stopBtn = document.getElementById('stop-btn'); // Stop button
+    const downloadBtn = document.getElementById('download-btn');
+    const audioPlayer = document.getElementById('audio-player');
+    const loading = document.getElementById('loading');
+    
+    const API_KEY = "57d586d05d2449e18b7f1fc19555e5fb"; // Replace with your API key
+    let selectedVoice = "en-US";  // Default voice for reading
 
-    request.onupgradeneeded = function(event) {
-      db = event.target.result;
-      const objectStore = db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
-      objectStore.createIndex('description', 'description', { unique: false });
-      objectStore.createIndex('amount', 'amount', { unique: false });
-      objectStore.createIndex('type', 'type', { unique: false });
-    };
+    // Function to split long text into chunks
+    function splitTextIntoChunks(text, maxLength) {
+      const chunks = [];
+      while (text.length > maxLength) {
+        const chunk = text.slice(0, maxLength);
+        const lastSpace = chunk.lastIndexOf(" ");
+        chunks.push(chunk.slice(0, lastSpace));
+        text = text.slice(lastSpace + 1);
+      }
+      chunks.push(text);
+      return chunks;
+    }
 
-    request.onsuccess = function(event) {
-      db = event.target.result;
-      displayTransactions();
-    };
+    // Read text aloud
+    readBtn.addEventListener('click', () => {
+      const text = textInput.value.trim();
+      if (!text) {
+        alert('Please enter some text!');
+        return;
+      }
 
-    request.onerror = function(event) {
-      console.error('Database error:', event.target.errorCode);
-    };
+      const chunks = splitTextIntoChunks(text, 500);  // Split if text is long
+      let totalLength = 0;
 
-    document.getElementById('transaction-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const id = document.getElementById('transaction-id').value;
-      if (id) {
-        updateTransaction(parseInt(id));
-      } else {
-        addTransaction();
+      for (const chunk of chunks) {
+        const utterance = new SpeechSynthesisUtterance(chunk);
+        utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === selectedVoice);
+        
+        // Auto-select text and scroll
+        utterance.onstart = function(event) {
+          textInput.setSelectionRange(totalLength, totalLength + chunk.length);
+          textInput.scrollTop = textInput.scrollHeight;
+          totalLength += chunk.length;
+        };
+
+        speechSynthesis.speak(utterance);
+      }
+
+      downloadBtn.disabled = false;  // Enable download after reading
+      stopBtn.disabled = false; // Enable stop button
+    });
+
+    // Stop reading aloud
+    stopBtn.addEventListener('click', () => {
+      speechSynthesis.cancel();  // Stops any ongoing speech
+      stopBtn.disabled = true;  // Disable the stop button after it's clicked
+    });
+
+    // Download audio functionality
+    downloadBtn.addEventListener('click', async () => {
+      const text = textInput.value.trim();
+      if (!text) return;
+
+      loading.style.display = 'block';  // Show loading indicator
+      try {
+        const response = await fetch(`https://api.openai.com/v1/audio/speech-to-text`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text: text })
+        });
+
+        const data = await response.json();
+        const audioUrl = data.audio_url;  // Assuming the API gives back an audio URL
+        audioPlayer.src = audioUrl;
+        audioPlayer.style.display = 'block';  // Show audio player
+        loading.style.display = 'none';
+      } catch (error) {
+        console.error('Error generating audio:', error);
+        loading.style.display = 'none';
+        alert('Error generating audio. Please try again.');
       }
     });
 
-    function addTransaction() {
-      const description = document.getElementById('description').value;
-      const amount = parseFloat(document.getElementById('amount').value);
-      const type = document.getElementById('type').value;
+    // Initial setup
+    window.addEventListener('load', () => {
+      if (!speechSynthesis) {
+        alert('Your browser does not support text-to-speech.');
+      }
+    });
+    
+    
+    
+    
+    
+ 
+  // Disable right-click context menu
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    alert("Right-click is disabled on this page.");
+  });
 
-      const transaction = db.transaction(['transactions'], 'readwrite');
-      const objectStore = transaction.objectStore('transactions');
-      const entry = { description, amount, type };
-      objectStore.add(entry);
-
-      transaction.oncomplete = function() {
-        displayTransactions();
-        document.getElementById('transaction-form').reset();
-      };
-
-      transaction.onerror = function(event) {
-        console.error('Transaction error:', event.target.errorCode);
-      };
+  // Disable keyboard shortcuts for developer tools (F12, Ctrl+Shift+I, Ctrl+Shift+J)
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12' || (e.ctrlKey && (e.shiftKey && (e.key === 'I' || e.key === 'J')))) {
+      e.preventDefault();
+      alert("Developer tools are disabled on this page.");
     }
+  });
 
-    function updateTransaction(id) {
-      const description = document.getElementById('description').value;
-      const amount = parseFloat(document.getElementById('amount').value);
-      const type = document.getElementById('type').value;
-
-      const transaction = db.transaction(['transactions'], 'readwrite');
-      const objectStore = transaction.objectStore('transactions');
-      const entry = { id, description, amount, type };
-      objectStore.put(entry);
-
-      transaction.oncomplete = function() {
-        displayTransactions();
-        document.getElementById('transaction-form').reset();
-        document.getElementById('transaction-id').value = '';
-        document.querySelector('button[type="submit"]').textContent = 'Add Transaction';
-      };
-
-      transaction.onerror = function(event) {
-        console.error('Transaction error:', event.target.errorCode);
-      };
+  // Detect developer tools open and alert the user
+  setInterval(function() {
+    if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+      alert("Developer tools detected. Please close them.");
     }
+  }, 1000);
 
-    function displayTransactions() {
-      const transactionList = document.getElementById('transaction-list');
-      transactionList.innerHTML = '';
+  // Disable text selection (optional)
+  document.body.style.webkitUserSelect = "none";
+  document.body.style.userSelect = "none";
 
-      const transaction = db.transaction(['transactions'], 'readonly');
-      const objectStore = transaction.objectStore('transactions');
-      const countRequest = objectStore.count();
-
-      countRequest.onsuccess = function() {
-        const totalItems = countRequest.result;
-        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
-        document.getElementById('prev-page').disabled = currentPage === 1;
-        document.getElementById('next-page').disabled = currentPage === totalPages;
-
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        const end = start + ITEMS_PER_PAGE;
-        const index = objectStore.index('description');
-
-        let i = 0;
-        index.openCursor().onsuccess = function(event) {
-          const cursor = event.target.result;
-          if (cursor) {
-            if (i >= start && i < end) {
-              const li = document.createElement('li');
-              li.textContent = `${cursor.value.description}: UGX ${cursor.value.amount.toFixed(2)} (${cursor.value.type})`;
-              li.dataset.id = cursor.value.id;
-
-              const buttons = document.createElement('div');
-              buttons.classList.add('buttons');
-
-              const editButton = document.createElement('button');
-              editButton.classList.add('edit');
-              editButton.textContent = 'Edit';
-              editButton.onclick = () => editTransaction(cursor.value);
-
-              const deleteButton = document.createElement('button');
-              deleteButton.classList.add('delete');
-              deleteButton.textContent = 'Delete';
-              deleteButton.onclick = () => deleteTransaction(cursor.value.id);
-
-              buttons.appendChild(editButton);
-              buttons.appendChild(deleteButton);
-              li.appendChild(buttons);
-
-              transactionList.appendChild(li);
-            }
-            i++;
-            cursor.continue();
-          } else {
-            updateSummary();
-          }
-        };
-      };
-    }
-
-    function editTransaction(transaction) {
-      document.getElementById('description').value = transaction.description;
-      document.getElementById('amount').value = transaction.amount;
-      document.getElementById('type').value = transaction.type;
-      document.getElementById('transaction-id').value = transaction.id;
-      document.querySelector('button[type="submit"]').textContent = 'Update Transaction';
-    }
-
-    function deleteTransaction(id) {
-      const transaction = db.transaction(['transactions'], 'readwrite');
-      const objectStore = transaction.objectStore('transactions');
-      objectStore.delete(id);
-
-      transaction.oncomplete = function() {
-        displayTransactions();
-      };
-
-      transaction.onerror = function(event) {
-        console.error('Transaction error:', event.target.errorCode);
-      };
-    }
-
-    function updateSummary() {
-      let totalIncome = 0;
-      let totalExpense = 0;
-
-      const transaction = db.transaction(['transactions'], 'readonly');
-      const objectStore = transaction.objectStore('transactions');
-      objectStore.openCursor().onsuccess = function(event) {
-        const cursor = event.target.result;
-        if (cursor) {
-          if (cursor.value.type === 'income') {
-            totalIncome += cursor.value.amount;
-          } else if (cursor.value.type === 'expense') {
-            totalExpense += cursor.value.amount;
-          }
-          cursor.continue();
-        } else {
-          const balance = totalIncome - totalExpense;
-          document.getElementById('total-income').textContent = `UGX ${totalIncome.toFixed(2)}`;
-          document.getElementById('total-expense').textContent = `UGX ${totalExpense.toFixed(2)}`;
-          document.getElementById('balance').textContent = `UGX ${balance.toFixed(2)}`;
-        }
-      };
-    }
-
-    const ITEMS_PER_PAGE = 3;
-    let currentPage = 1;
-
-    function nextPage() {
-      currentPage++;
-      displayTransactions();
-    }
-
-    function prevPage() {
-      currentPage--;
-      displayTransactions();
-    }
   </script>
 </body>
-</html>
+  </html>
+
