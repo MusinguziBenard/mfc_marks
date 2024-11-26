@@ -1,7 +1,7 @@
 
 {
-    "name": "Fatima College AOI Marks",
-    "short_name": "AOI Marks",
+    "name": "Fatima College Text To Audio App",
+    "short_name": "Text to Audio",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
