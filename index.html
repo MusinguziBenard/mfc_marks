@@ -1,144 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fun Learning Adventure: All-in-One Tutor</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fun Learning Hub — Emoji & Voice (One File)</title>
 <style>
-body { font-family: Verdana,sans-serif; background:#f0f8ff; color:#333; text-align:center; margin:0; padding:20px; font-size:28px;}
-h1,h2 { color:#ff4500; text-shadow:2px 2px 4px rgba(0,0,0,0.1);}
-button {background:#32cd32; color:white; border:none; padding:15px 30px; font-size:32px; margin:10px; cursor:pointer; border-radius:10px; transition: transform 0.2s;}
-button:hover {transform:scale(1.1);}
-.section {display:none; margin-top:50px;}
-#welcome {display:block;}
-.word-container, .sentence-container, .math-container {margin:20px auto; width:90%; max-width:800px; background:#fffacd; padding:20px; border-radius:15px; box-shadow:0 4px 8px rgba(0,0,0,0.2);}
-.item {display:inline-block; padding:15px 25px; margin:10px; background:#87cefa; border-radius:15px; cursor:pointer; font-size:36px; touch-action:manipulation; transition:background-color 0.3s, transform 0.3s;}
-.item.selected {background:#ffd700; transform:scale(1.2);}
-.dropzone {min-height:100px; border:3px dashed #ff69b4; border-radius:15px; padding:30px; margin:30px 0; background:#f8f8ff; font-size:36px; display:flex; flex-wrap:wrap; justify-content:center; align-items:center;}
-.correct {background:#90ee90 !important; animation:bounce 0.5s;}
-.incorrect {background:#ff6347 !important; animation:shake 0.5s;}
-@keyframes bounce {0%,100%{transform:translateY(0);}50%{transform:translateY(-30px);}}
-@keyframes shake {0%,100%{transform:translateX(0);}25%{transform:translateX(-15px);}75%{transform:translateX(15px);}}
-#score{font-size:32px; color:#ffd700; margin-top:20px;}
-#rating{font-size:32px; color:#ff4500; margin-top:10px;}
-#motivation{font-size:40px; color:#ff1493; margin:20px; animation:pulse 1s infinite;}
-@keyframes pulse {0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
-.star{font-size:60px; color:#ffd700; display:inline-block; animation:spin 2s linear infinite;}
-@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-canvas{position:fixed; top:0; left:0; pointer-events:none; z-index:1000;}
-.demo-animation{margin:20px; padding:20px; background:#ffe4b5; border-radius:10px; font-size:28px; animation:fadeIn 2s;}
-@keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
-.congrats{font-size:50px; color:#ff4500; animation:bounce 1s infinite; margin:20px;}
-input[type="number"]{font-size:32px; padding:10px 20px; margin:10px; border-radius:10px; border:2px solid #32cd32; text-align:center; width:120px;}
-@media(max-width:600px){body{padding:10px;font-size:24px;}button{padding:10px 20px;font-size:28px;}.item{padding:10px 20px;font-size:30px;margin:5px;}.dropzone{padding:20px;min-height:100px;}h1,h2{font-size:36px;}#motivation{font-size:32px;}.congrats{font-size:40px;}}
+:root{--bg:#f7fbff;--ink:#111827;--brand:#ff6b35;--accent:#6c8cff;--ok:#16a34a;--bad:#ef4444;--panel:#fffdf2;--chip:#87cefa;--chip-sel:#ffd700}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:var(--ink);background:var(--bg);overflow:hidden}
+.wrap{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+header{background:linear-gradient(90deg,#fff,#fff2ea);box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.top{max-width:1100px;margin:0 auto;padding:10px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{font-size:1.1rem;color:var(--brand);margin:0}
+.controls-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pill{background:#fff;padding:8px 10px;border-radius:999px;border:1px solid #f0f0f0;display:inline-flex;align-items:center;gap:8px}
+.meter{height:10px;background:#fff;border-radius:999px;overflow:hidden;border:2px solid #ffe6d0;flex:1}
+.meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb703,#ffd166);transition:width .35s}
+
+main{max-width:1100px;margin:10px auto;padding:10px;height:calc(100vh - 170px);display:grid;grid-template-rows:1fr auto;gap:10px}
+.hub{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;height:100%}
+.card{background:var(--panel);border-radius:14px;padding:12px;box-shadow:0 10px 24px rgba(0,0,0,.06);display:flex;flex-direction:column}
+.card h2{margin:0 0 8px;color:#ff4d00;font-size:1rem}
+.centered{display:flex;align-items:center;justify-content:center}
+.picture{flex:1;border-radius:12px;border:3px dashed #ffd6f2;background:#fff;display:flex;align-items:center;justify-content:center;font-size:4.8rem}
+.hint{margin-top:8px;font-size:.95rem;color:#374151;min-height:1.2em}
+.drop{flex:1;border-radius:12px;border:3px dashed #ffd6f2;background:#fff;padding:10px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:2.2rem}
+.choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:8px;background:#fff;border-radius:10px}
+.chip{display:inline-flex;align-items:center;justify-content:center;background:var(--chip);border-radius:12px;padding:10px 14px;font-size:1.9rem;cursor:pointer;user-select:none;transition:transform .12s,background .12s}
+.chip:active{transform:scale(.96)}
+.chip.selected{background:var(--chip-sel);transform:scale(1.06)}
+.drop.ok{animation:pop .5s;box-shadow:inset 0 0 0 4px rgba(22,163,74,.12)}
+.drop.bad{animation:shake .4s;box-shadow:inset 0 0 0 4px rgba(239,68,68,.12)}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.mode-tabs{display:flex;gap:6px}
+.tab{background:#fff;padding:8px 10px;border-radius:999px;border:2px solid #f1f5f9;cursor:pointer}
+.tab.active{background:linear-gradient(90deg,#fff7ef,#fff2f0);border-color:#ffd2b3}
+
+.bottom-row{display:flex;gap:8px;justify-content:center;padding:8px}
+.btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600;box-shadow:0 10px 20px rgba(108,140,255,.12)}
+.btn.ghost{background:#fff;color:#111;border:1px solid #e6e7eb;box-shadow:none}
+.small{padding:8px 10px;font-size:.95rem}
+
+footer{padding:8px;text-align:center;color:#6b7280}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
+
+/* responsive: stack on small */
+@media (max-width:980px){.hub{grid-template-columns:1fr 1fr;grid-auto-rows:1fr}.picture{font-size:3.6rem}.chip{font-size:1.6rem;padding:8px 12px}}
+@media (max-width:560px){.hub{grid-template-columns:1fr}.picture{font-size:3.2rem}}
 </style>
 </head>
 <body>
 <canvas id="confetti"></canvas>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <div class="brand">
+        <div style="font-size:1.5rem">🌈</div>
+        <h1>Fun Learning Hub</h1>
+      </div>
+      <div class="meter" aria-label="Progress"><i id="progressFill"></i></div>
+      <div class="controls-right">
+        <div class="pill">⭐ <b id="stars">0</b></div>
+        <div class="pill">✅ <b id="correct">0</b></div>
+        <div class="pill">🔁 <small id="modeLabel">Words</small></div>
+        <button id="mic" class="pill" title="Tap to speak">🎙️ <span id="micLabel">Speak</span></button>
+        <button id="mute" class="pill">🔊 On</button>
+      </div>
+    </div>
+  </header>
 
-<div id="welcome" class="section">
-<h1>Welcome to Fun Learning Adventure! 🌈</h1>
-<p>Learn words, build sentences, and solve math interactively! 🎉</p>
-<button onclick="startSpellings()">Learn Words ✨</button>
-<button onclick="startSentences()">Build Sentences 🚀</button>
-<button onclick="startMath()">Solve Math 🧮</button>
+  <main>
+    <div class="hub">
+      <!-- Word Builder -->
+      <section id="panelWords" class="card">
+        <h2>🔤 Word Builder</h2>
+        <div class="picture" id="wordEmoji">🐱</div>
+        <div class="hint" id="wordHint"></div>
+        <div style="margin-top:12px" class="drop" id="wordDrop" aria-label="drop letters here"></div>
+        <div style="margin-top:10px" class="choices" id="letterChoices"></div>
+      </section>
+
+      <!-- Sentence Builder -->
+      <section id="panelSentences" class="card">
+        <h2>🧩 Sentence Builder</h2>
+        <div class="picture centered" id="sentEmoji">🧠</div>
+        <div class="hint" id="sentHint"></div>
+        <div style="margin-top:10px" class="drop" id="sentDrop" aria-label="drop words here"></div>
+        <div style="margin-top:10px" class="choices" id="wordChoices"></div>
+      </section>
+
+      <!-- Quick Playground / Placeholder for Math/Science/SST -->
+      <section id="panelPlay" class="card">
+        <h2>🎯 Play & Hub</h2>
+        <div class="hint">Switch modes (Words / Sentences / Math / Science / SST) — the engine is modular and emoji-first.</div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <button class="tab active" data-mode="words">📖 Words</button>
+          <button class="tab" data-mode="sentences">✍️ Sentences</button>
+          <button class="tab" data-mode="math">➕ Math</button>
+          <button class="tab" data-mode="science">🔬 Science</button>
+          <button class="tab" data-mode="sst">🌍 SST</button>
+          <button class="tab" data-mode="tutor">🤖 Tutor</button>
+        </div>
+
+        <div style="margin-top:12px" id="playArea"></div>
+      </section>
+    </div>
+
+    <div class="bottom-row">
+      <button id="repeat" class="btn ghost small">🔁 Repeat</button>
+      <button id="hintBtn" class="btn ghost small">💡 Hint</button>
+      <button id="check" class="btn small">✅ Check</button>
+      <button id="next" class="btn small">⏭️ Next</button>
+    </div>
+  </main>
+
+  <footer>
+    Massive encouragement mode ON — we solve together! 🌟
+  </footer>
 </div>
-
-<div id="spellings" class="section">
-<h2>Word Magic! 🪄</h2>
-<p>Tap letters or say the word! Hint: <span id="spelling-hint"></span> 📝</p>
-<button onclick="speakHint()">Hear Hint! 🔊</button>
-<button onclick="provideHint('spelling')">Get a Hint! 🤔</button>
-<div id="letters-container" class="word-container"></div>
-<div id="spelling-dropzone" class="dropzone"></div>
-<button onclick="checkSpelling()">Check My Word! ✅</button>
-<div id="spelling-feedback"></div>
-<div id="spelling-demo" class="demo-animation">Tap letters or speak the word aloud! 😊</div>
-</div>
-
-<div id="sentences" class="section">
-<h2>Sentence Builder! 🏗️</h2>
-<p>Tap words or speak the sentence! 📖</p>
-<button onclick="speakSentenceHint()">Hear Hint! 🔊</button>
-<button onclick="provideHint('sentence')">Get a Hint! 🤔</button>
-<div id="words-container" class="sentence-container"></div>
-<div id="sentence-dropzone" class="dropzone"></div>
-<button onclick="checkSentence()">Check My Sentence! ✅</button>
-<div id="sentence-feedback"></div>
-<div id="sentence-demo" class="demo-animation">Tap words or speak to build the sentence! 🌟</div>
-</div>
-
-<div id="math" class="section">
-<h2>Math Wizardry! 🧮</h2>
-<p>Solve the problem! Speak or type your answer 🗣️✏️</p>
-<div id="math-problem" class="math-container"></div>
-<input type="number" id="math-answer" placeholder="Your Answer"/>
-<button onclick="checkMath()">Submit ✅</button>
-<div id="math-feedback"></div>
-<div id="math-demo" class="demo-animation">Solve step by step! 🎯</div>
-</div>
-
-<div id="score">Stars Earned: 0 ⭐</div>
-<div id="rating">Rating: 0%</div>
-<div id="motivation"></div>
-<div id="congrats" class="congrats"></div>
 
 <script>
-let spellingWords=[{word:'cat',hint:'A furry pet 🐱'},{word:'dog',hint:'A loyal friend 🐶'},{word:'sun',hint:'Shines bright ☀️'}];
-let sentenceParts=[{correct:'The cat is sleeping.',shuffled:['cat','The','sleeping.','is'],hint:'A pet rests 😴'}];
-let usedSpellingIndices=[], usedSentenceIndices=[], score=0, attempts=0, correctCount=0;
-let currentWord='', currentSentenceHint='', currentSentenceIndex=0;
-
-// Math problems
-let mathProblems=[
-{problem:'5 + 3', answer:8, hint:'Add the two numbers 🧮'},
-{problem:'10 - 4', answer:6, hint:'Subtract the second number from the first ➖'},
-{problem:'6 × 2', answer:12, hint:'Multiply the numbers ✖️'},
-{problem:'12 ÷ 3', answer:4, hint:'Divide the first number by the second ➗'}
-];
-let currentMathIndex=0;
-
-const synth=window.speechSynthesis;
-let recognition;
-if('webkitSpeechRecognition' in window){
-recognition=new webkitSpeechRecognition();
-recognition.continuous=true;
-recognition.interimResults=false;
-recognition.lang='en-US';
-recognition.onresult=(event)=>{
-let transcript=event.results[event.results.length-1][0].transcript.trim().toLowerCase();
-if(document.getElementById('spellings').style.display==='block'){checkSpokenWord(transcript);}
-else if(document.getElementById('sentences').style.display==='block'){checkSpokenSentence(transcript);}
-else if(document.getElementById('math').style.display==='block'){checkSpokenMath(transcript);}
+/* ======= Content (Emoji-first, modular) ======= */
+const CONTENT = {
+  literacy: {
+    words: [
+      { clue:'🐱', answer:'CAT', hint:'A furry pet that says meow'},
+      { clue:'🐶', answer:'DOG', hint:'A loyal friend that barks'},
+      { clue:'🍎', answer:'APPLE', hint:'A fruit that can be red or green'},
+      { clue:'🚗', answer:'CAR', hint:'Goes vroom on the road'},
+      { clue:'🌞', answer:'SUN', hint:'Shines bright in the sky'},
+      { clue:'📖', answer:'BOOK', hint:'Full of stories'}
+    ],
+    sentences:[
+      { clue:'I ❤️', parts:['I','love','reading'], answer:'I love reading', hint:'How you feel about books'},
+      { clue:'He 🏃‍♂️', parts:['He','likes','to','run'], answer:'He likes to run', hint:'About moving fast'},
+      { clue:'We 🍎', parts:['We','like','apples'], answer:'We like apples', hint:'A sentence about fruit'}
+    ]
+  },
+  math: {
+    exercises:[
+      { clue:'🍎 + 🍎 = ?', answer:'2', hint:'Two apples'},
+      { clue:'3️⃣ + 2️⃣ = ?', answer:'5', hint:'Add three and two'}
+    ]
+  },
+  science:{
+    q:[{ clue:'Which lives in water?', options:['🐟','🐕','🐦'], answer:'🐟', hint:'Fish live in water'}]
+  },
+  sst:{
+    q:[{ clue:'Which is a globe?', options:['🗺️','🏠','🚗'], answer:'🗺️', hint:'A map or globe shows the world'}]
+  }
 };
-recognition.onerror=(e)=>console.log('SpeechRecognition Error:',e);
-recognition.start();
-}else{alert('Speech recognition not supported 😢');}
 
-function removeEmojis(text){return text.replace(/[\u{1F600}-\u{1F9FF}\u{1F300}-\u{1F5FF}\u{2600}-\u{27BF}]/gu,'');}
-function speak(text){if(synth){let u=new SpeechSynthesisUtterance(removeEmojis(text)); u.rate=0.8; u.pitch=1.2; synth.speak(u);}}
-function getRandomIndex(array,used){if(used.length>=array.length){used.length=0;} let index; do{index=Math.floor(Math.random()*array.length);}while(used.includes(index)); used.push(index); return index;}
+/* ======= State ======= */
+const state = { mode:'words', mute:false, stars:0, correct:0, idx:{words:0,sentences:0,math:0,science:0,sst:0}, tutor:false };
 
-// Score & motivation
-function updateScoreAndRating(){document.getElementById('score').textContent='Stars Earned: '+score+' ⭐'; let rating=Math.round((correctCount/attempts)*100)||0; document.getElementById('rating').textContent='Rating: '+rating+'%';}
-function showMotivation(){const messages=['You rock! 🌟','Keep it up! 💪','Awesome job! 🎉','Superstar! 🏆','Brilliant! 🧠','Fantastic! ✨'];const msg=messages[Math.floor(Math.random()*messages.length)];document.getElementById('motivation').textContent=msg;}
-function showCongrats(msg){const elem=document.getElementById('congrats'); elem.textContent=msg; setTimeout(()=>{elem.textContent='';},3000);}
-function showConfetti(){const canvas=document.getElementById('confetti'); const ctx=canvas.getContext('2d'); canvas.width=window.innerWidth; canvas.height=window.innerHeight; let particles=[]; for(let i=0;i<200;i++){particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+2, d:Math.random()*200, color:`hsl(${Math.random()*360},100%,50%)`, tilt:Math.random()*10-10});} let angle=0; function draw(){ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ctx.beginPath(); ctx.lineWidth=p.r; ctx.strokeStyle=p.color; ctx.moveTo(p.x+p.tilt+p.r/2,p.y); ctx.lineTo(p.x+p.tilt,p.y+p.d/20); ctx.stroke(); p.tilt+=0.1; p.y+=Math.cos(angle+p.d)*1; if(p.y>canvas.height){p.y=0; p.x=Math.random()*canvas.width;} }); angle+=0.01; requestAnimationFrame(draw);} draw();}
-function clearConfetti(){const canvas=document.getElementById('confetti'); const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);}
+/* ======= Utils ======= */
+const $ = id => document.getElementById(id);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = arr => arr.slice().sort(()=>Math.random()-.5);
+const removeEmoji = s => s && s.replace(/[\p{Extended_Pictographic}\u{FE0F}]/gu,'');
 
-// Start Math
-function startMath(){document.getElementById('welcome').style.display='none'; document.getElementById('spellings').style.display='none'; document.getElementById('sentences').style.display='none'; document.getElementById('math').style.display='block'; loadMath(); speak('Let\'s solve math problems! 🧮');}
+function save(){ try{ localStorage.setItem('fl_hub', JSON.stringify({stars:state.stars,correct:state.correct,idx:state.idx})); }catch(e){} }
+function load(){ try{ const r=JSON.parse(localStorage.getItem('fl_hub')||'{}'); if(r.stars) state.stars=r.stars; if(r.correct) state.correct=r.correct; if(r.idx) state.idx=r.idx;}catch(e){} }
 
-// Load Math
-function loadMath(){clearConfetti(); const index=getRandomIndex(mathProblems,[]); currentMathIndex=index; const mp=mathProblems[index]; document.getElementById('math-problem').textContent='Problem: '+mp.problem+' 🤔'; document.getElementById('math-answer').value=''; document.getElementById('math-feedback').textContent=''; speak(mp.hint);}
+/* ======= TTS & Sound ======= */
+const synth = window.speechSynthesis;
+function speak(txt, opts={rate:0.95,pitch:1.05}){
+  if(state.mute) return;
+  if(!('speechSynthesis' in window)) return;
+  const u=new SpeechSynthesisUtterance(removeEmoji(txt)); u.rate=opts.rate; u.pitch=opts.pitch; synth.cancel(); synth.speak(u);
+}
+function tone(){ if(state.mute) return; try{ const ac=new(window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(); const g=ac.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=0.0001; g.gain.exponentialRampToValueAtTime(0.2, ac.currentTime+0.01); o.connect(g).connect(ac.destination); o.start(); o.frequency.exponentialRampToValueAtTime(1320, ac.currentTime+.18); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+.4); o.stop(ac.currentTime+.4);}catch(e){}
+}
 
-// Check Math
-function checkMath(){const ans=parseFloat(document.getElementById('math-answer').value); const correct=mathProblems[currentMathIndex].answer; attempts++; if(ans===correct){score++; correctCount++; document.getElementById('math-feedback').textContent='🎉 Correct! Well done!'; speak('Awesome! You solved it correctly! 👏'); showConfetti(); showMotivation(); showCongrats('Math Wizard! 🧙‍♂️'); setTimeout(loadMath,2000);} else{document.getElementById('math-feedback').textContent='Oops! Try again! 💪'; speak('Try again!');} updateScoreAndRating();}
+/* ======= Confetti ======= */
+function confetti(ms=1200){ const c=$('confetti'); const ctx=c.getContext('2d'); const dpr=Math.max(1,devicePixelRatio||1); c.width=innerWidth*dpr; c.height=innerHeight*dpr; ctx.scale(dpr,dpr); const N=220, parts=[]; for(let i=0;i<N;i++) parts.push({x:Math.random()*innerWidth,y:-Math.random()*innerHeight,r:Math.random()*7+3,c:`hsl(${Math.random()*360},100%,50%)`,vy:2+Math.random()*4}); let t=0, stop=ms/16; (function draw(){ ctx.clearRect(0,0,innerWidth,innerHeight); for(const p of parts){ ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); p.y+=p.vy; if(p.y>innerHeight) p.y=-p.r; } if(t++<stop) requestAnimationFrame(draw); else ctx.clearRect(0,0,innerWidth,innerHeight); })(); }
 
-// Speech check Math
-function checkSpokenMath(text){const correct=mathProblems[currentMathIndex].answer; if(parseFloat(text)==correct){document.getElementById('math-feedback').textContent='🎉 Correct via speech!'; speak('Amazing! You got it! 👏'); score++; correctCount++; attempts++; updateScoreAndRating(); showConfetti(); showMotivation(); showCongrats('Math Wizard! 🧙‍♂️'); setTimeout(loadMath,2000);}}
+/* ======= HUD ======= */
+function updateHud(){ $('stars').textContent = state.stars; $('correct').textContent = state.correct; $('progressFill').style.width = Math.min(100,(state.correct%5)*20)+'%'; $('modeLabel').textContent = state.mode.charAt(0).toUpperCase()+state.mode.slice(1); }
 
-// --- Word & Sentence functions (from previous code) can remain the same ---
+/* ======= Word Builder ======= */
+function loadWord(){ const list = CONTENT.literacy.words; const idx = state.idx.words % list.length; const item = list[idx]; $('wordEmoji').textContent = item.clue; $('wordHint').textContent = item.hint; $('wordDrop').innerHTML=''; const letters = shuffle(item.answer.split('')); const choices=$('letterChoices'); choices.innerHTML=''; letters.forEach(ch=>{ const d=document.createElement('div'); d.className='chip'; d.textContent=ch; d.onclick=()=>{ d.classList.add('selected'); setTimeout(()=>d.classList.remove('selected'),180); $('wordDrop').appendChild(d); speak(ch); }; choices.appendChild(d); }); $('wordDrop').onclick = e=>{ if(e.target.classList.contains('chip') && e.target.parentNode==$('wordDrop')){ $('letterChoices').appendChild(e.target); speak('remove'); } } }
+
+function checkWord(){ const item = CONTENT.literacy.words[state.idx.words % CONTENT.literacy.words.length]; const formed = [...$('wordDrop').children].map(n=>n.textContent).join(''); if(formed.toUpperCase()===item.answer.toUpperCase()){ successFlow(item.answer); state.idx.words++; } else { failFlow(formed); } save(); updateHud(); }
+
+/* ======= Sentence Builder ======= */
+function loadSentence(){ const list=CONTENT.literacy.sentences; const idx = state.idx.sentences % list.length; const item = list[idx]; $('sentEmoji').textContent = item.clue; $('sentHint').textContent = item.hint || '' ; $('sentDrop').innerHTML=''; const words = shuffle(item.parts); const choices=$('wordChoices'); choices.innerHTML=''; words.forEach(w=>{ const d=document.createElement('div'); d.className='chip'; d.textContent=w; d.onclick=()=>{ d.classList.add('selected'); setTimeout(()=>d.classList.remove('selected'),180); $('sentDrop').appendChild(d); speak(w); }; choices.appendChild(d); }); $('sentDrop').onclick=e=>{ if(e.target.classList.contains('chip') && e.target.parentNode==$('sentDrop')){ $('wordChoices').appendChild(e.target); speak('remove'); } } }
+function checkSentence(){ const item=CONTENT.literacy.sentences[state.idx.sentences % CONTENT.literacy.sentences.length]; const formed = [...$('sentDrop').children].map(n=>n.textContent).join(' '); if(formed===item.answer){ successFlow(item.answer); state.idx.sentences++; } else { failFlow(formed); } save(); updateHud(); }
+
+/* ======= Generic success/fail ======= */
+function successFlow(answer){ $('wordDrop').classList.remove('bad'); $('sentDrop').classList.remove('bad'); $('wordDrop').classList.add('ok'); $('sentDrop').classList.add('ok'); const praises = ['Brilliant!','Fantastic!','You did it!','Amazing!','Super!']; const msg = pick(praises); state.stars++; state.correct++; speak(`${msg} ${answer}. Great teamwork!`); tone(); confetti(900); setTimeout(()=>{ $('wordDrop').classList.remove('ok'); $('sentDrop').classList.remove('ok'); },700); }
+function failFlow(formed){ const msg = formed? `I heard: ${formed}.` : 'No answer yet.'; speak(`${msg} Almost there! Let\'s try together.`); $('wordDrop').classList.add('bad'); $('sentDrop').classList.add('bad'); setTimeout(()=>{ $('wordDrop').classList.remove('bad'); $('sentDrop').classList.remove('bad'); },550); }
+
+/* ======= Hint logic (costs a star) ======= */
+function giveHint(){ if(state.stars<=0){ speak('Earn a star first to get a hint. You can do it!'); return; } state.stars--; if(state.mode==='words'){ const item = CONTENT.literacy.words[state.idx.words % CONTENT.literacy.words.length]; const built = [...$('wordDrop').children].map(n=>n.textContent).join(''); if(built.length < item.answer.length){ const next = item.answer[built.length]; const chip=[...$('letterChoices').children].find(c=>c.textContent.toUpperCase()===next.toUpperCase()); if(chip) { $('wordDrop').appendChild(chip); chip.classList.add('selected'); setTimeout(()=>chip.classList.remove('selected'),220); speak(next); } } }
+else if(state.mode==='sentences'){ const item = CONTENT.literacy.sentences[state.idx.sentences % CONTENT.literacy.sentences.length]; const built = [...$('sentDrop').children].map(n=>n.textContent); if(built.length < item.parts.length){ const next = item.parts[built.length]; const chip=[...$('wordChoices').children].find(c=>c.textContent===next); if(chip){ $('sentDrop').appendChild(chip); chip.classList.add('selected'); setTimeout(()=>chip.classList.remove('selected'),220); speak(next); } } }
+updateHud(); save(); }
+
+/* ======= Mode switching & UI wiring ======= */
+function setMode(m){ state.mode=m; document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===m)); if(m==='words'){ $('panelWords').style.display='flex'; $('panelSentences').style.display='none'; } else if(m==='sentences'){ $('panelWords').style.display='none'; $('panelSentences').style.display='flex'; } else { $('panelWords').style.display='none'; $('panelSentences').style.display='none'; }
+$('modeLabel').textContent = m.charAt(0).toUpperCase()+m.slice(1); updateHud(); if(m==='words') loadWord(); if(m==='sentences') loadSentence(); /* placeholders for other modes */ }
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
+
+/* ======= Voice recognition (robust handling) ======= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let recog = null; let listening = false; let lastTranscript = '';
+function initRecog(){ if(!SR) return null; if(recog) return recog; try{ recog = new SR(); recog.continuous = false; recog.interimResults = false; recog.lang = 'en-US'; recog.maxAlternatives = 4; recog.onstart = ()=>{ listening=true; $('micLabel').textContent='Listening...'; $('mic').style.background='#fff3cd'; }; recog.onend = ()=>{ listening=false; $('micLabel').textContent='Speak'; $('mic').style.background=''; }; recog.onerror = e=>{ listening=false; $('micLabel').textContent='Speak'; $('mic').style.background=''; console.warn('Recognition error', e); }; recog.onresult = e=>{ const res = e.results[0]; const transcripts = []; for(let i=0;i<res.length;i++) transcripts.push(res[i].transcript.trim()); lastTranscript = transcripts[0]; handleSpeechResult(transcripts); }; return recog;}catch(err){ return null;} }
+
+function startListening(){ const r = initRecog(); if(!r){ alert('Speech recognition not supported on this browser. Use Chrome or Edge on desktop or Android for full voice features.'); return; } try{ r.start(); }catch(e){} }
+
+function handleSpeechResult(list){ const t = (list[0]||'').toLowerCase(); // best guess
+  // simple routing: if tutor active, engage in co-solve; otherwise evaluate
+  if(state.tutor){ tutorHandle(t); return; }
+  if(state.mode==='words'){ const target = CONTENT.literacy.words[state.idx.words % CONTENT.literacy.words.length].answer.toLowerCase(); if(t===target || t.replace(/[^a-z]/g,'')===target){ successFlow(target); state.idx.words++; } else { // try close match
+      // check if transcript contains target as a word or letters spelled
+      if(t.includes(target)) { successFlow(target); state.idx.words++; } else { speak(`I heard ${t}. Let's try again together. Repeat after me: ${target}`); } }
+  } else if(state.mode==='sentences'){ const target = CONTENT.literacy.sentences[state.idx.sentences % CONTENT.literacy.sentences.length].answer.toLowerCase(); if(t===target || t.replace(/[^a-z ]/g,'')===target){ successFlow(target); state.idx.sentences++; } else { speak(`I heard ${t}. Let's try saying it together: ${target}`); } }
+  updateHud(); save(); }
+
+/* ======= Tutor co-solve (simple guided interaction) ======= */
+let tutorStep=0;
+function startTutor(){ state.tutor=true; speak('Hello friend! I will guide you step by step. Say ready when you are.'); }
+function stopTutor(){ state.tutor=false; tutorStep=0; speak('Tutor off. Great work!'); }
+function tutorHandle(transcript){ const t = transcript.toLowerCase(); if(t.includes('ready')||t.includes('yes')||t.includes('i am ready')){ tutorStep=1; speak('Awesome — repeat after me: C'); startListening(); } else if(tutorStep===1){ // expecting letter
+    // we accept any single-letter utterance; proceed to next
+    tutorStep=2; speak('Great! Now say A'); startListening(); } else if(tutorStep===2){ tutorStep=3; speak('Wonderful! Now say T'); startListening(); } else if(tutorStep===3){ speak('Perfect! You spelled CAT. High five!'); state.stars++; state.correct++; save(); updateHud(); tutorStep=0; state.tutor=false; } else { speak('Say ready when you are!'); }
+}
+
+/* ======= Event wiring ======= */
+$('check').addEventListener('click', ()=>{ if(state.mode==='words') checkWord(); else if(state.mode==='sentences') checkSentence(); });
+$('hintBtn').addEventListener('click', giveHint);
+$('next').addEventListener('click', ()=>{ if(state.mode==='words'){ state.idx.words++; loadWord(); } else if(state.mode==='sentences'){ state.idx.sentences++; loadSentence(); } updateHud(); save(); });
+$('repeat').addEventListener('click', ()=>{ if(state.mode==='words'){ const it = CONTENT.literacy.words[state.idx.words % CONTENT.literacy.words.length]; speak(it.clue + '. ' + it.hint); } else if(state.mode==='sentences'){ const it = CONTENT.literacy.sentences[state.idx.sentences % CONTENT.literacy.sentences.length]; speak(it.clue + '. ' + (it.hint||'')); } });
+$('mic').addEventListener('click', ()=>{ // toggle listening for a single phrase
+  if(listening){ if(recog) recog.stop(); return; } startListening(); });
+$('mute').addEventListener('click', ()=>{ state.mute=!state.mute; $('mute').textContent = state.mute? '🔇 Off':'🔊 On'; });
+
+/* tabs */
+document.querySelectorAll('.tab').forEach(tb=>tb.addEventListener('click', e=>{ setMode(tb.dataset.mode); if(tb.dataset.mode==='tutor'){ startTutor(); } else { state.tutor=false; tutorStep=0;} }));
+
+/* Initialize */
+load(); setMode('words'); updateHud();
+
+// try to init speech recognition early (but don't start)
+initRecog();
+
 </script>
 </body>
 </html>
